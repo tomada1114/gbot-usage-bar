@@ -1,7 +1,7 @@
 ---
 name: integrating-system-apis
 description: >
-  Covers calling a macOS system API from ClaudeUsageBarPlatform under Swift 6 strict concurrency:
+  Covers calling a macOS system API from GbotUsageBarPlatform under Swift 6 strict concurrency:
   where the port, the adapter, the fake, and the local-machine test go; a C callback
   carrying self through a refcon with Unmanaged; MainActor.assumeIsolated versus a Task
   hop; @preconcurrency import; non-Sendable CF types; teardown order. Use when adding a
@@ -15,7 +15,7 @@ description: >
 
 # Integrating System APIs
 
-**Owns:** calling a macOS system API from `ClaudeUsageBarPlatform` — which mechanism, how its C
+**Owns:** calling a macOS system API from `GbotUsageBarPlatform` — which mechanism, how its C
 callback survives Swift 6, how a TCC grant behaves, and what may be tested where.
 **Does not own:** whether the app may be sandboxed at all or what shape it takes
 (`starting-an-app`); the red-green loop for the Core decision the port serves (`tdd`);
@@ -25,21 +25,21 @@ coverage floor that pushes work into Core (`changing-gates`).
 ## The shape, before any OS code
 
 Every integration is the same five pieces, and this app already has one of each to copy
-(`UsageFetching` / `URLSessionUsageFetcher` is a second set) — `docs/architecture.md` ›
+— `docs/architecture.md` ›
 "Ports and adapters" is the full description:
 
 | Piece | Where | Worked example |
 |---|---|---|
-| Port: a `Sendable` protocol, value types in and out | `Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarCore/` | `OAuthTokenProviding.swift` |
-| Adapter: the OS framework import, translation only | `Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarPlatform/` | `SecurityCLITokenProvider.swift` |
-| Fake: a real implementation answering from test data | `Tests/ClaudeUsageBarTestSupport/` | `FakeOAuthTokenProvider.swift` |
-| Local-machine test: the adapter against the real OS | `Tests/ClaudeUsageBarPlatformTests/` | `SecurityCLITokenProviderTests.swift` |
-| Contract: the port's promises, run against the fake and the adapter | `Tests/ClaudeUsageBarTestSupport/` | `OAuthTokenProvidingContract.swift` |
+| Port: a `Sendable` protocol, value types in and out | `Packages/GbotUsageBarKit/Sources/GbotUsageBarCore/` | `CacheFileReading.swift` |
+| Adapter: the OS framework import, translation only | `Packages/GbotUsageBarKit/Sources/GbotUsageBarPlatform/` | `CacheFolderReader.swift` |
+| Fake: a real implementation answering from test data | `Tests/GbotUsageBarTestSupport/` | `FakeCacheFileReader.swift` |
+| Local-machine test: the adapter against the real OS | `Tests/GbotUsageBarPlatformTests/` | `CacheFolderReaderTests.swift` |
+| Contract: the port's promises, run against the fake and the adapter | `Tests/GbotUsageBarTestSupport/` | `CacheFileReadingContract.swift` |
 
 Write the port first. Its signature is where you decide what the OS type collapses into,
 and an adapter written before its port almost always leaks one: `CGEvent`, `AXUIElement`,
 `NSRunningApplication`, `EventHotKeyRef`, and `CFMachPort` are all non-`Sendable`, all
-banned from `ClaudeUsageBarCore` by `.swiftlint.yml`'s `no_ui_import_in_core` and
+banned from `GbotUsageBarCore` by `.swiftlint.yml`'s `no_ui_import_in_core` and
 `ArchitectureBoundaryTests`, and all better as a `struct` Core owns.
 
 Put the isolation in the port too. Nearly every OS mechanism here is bound to one run
@@ -123,7 +123,7 @@ document.
 
 ## Before you call it done
 
-- [ ] The port takes and returns Core value types only, and `ClaudeUsageBarCore` imports no OS
+- [ ] The port takes and returns Core value types only, and `GbotUsageBarCore` imports no OS
       framework (`just test` runs `ArchitectureBoundaryTests`; `just lint` runs
       `no_ui_import_in_core`).
 - [ ] Every `passRetained` has exactly one `release()` on every exit path, including
@@ -132,10 +132,10 @@ document.
       owner can go away.
 - [ ] Every decision — what to show while ungranted, when to prompt, what a press means —
       is in Core behind the port, with a Core test against a fake.
-- [ ] The adapter has a `.requiresLocalMachine` test in `Tests/ClaudeUsageBarPlatformTests`, and
+- [ ] The adapter has a `.requiresLocalMachine` test in `Tests/GbotUsageBarPlatformTests`, and
       the pull request carries its `just test-local` output. No gate produces it
       (`AGENTS.md` › "Enforcement layers").
-- [ ] The port's fake and its contract function live in `Tests/ClaudeUsageBarTestSupport`, and
-      the contract runs against both the fake (`ClaudeUsageBarCoreTests`) and the adapter
-      (`ClaudeUsageBarPlatformTests`).
+- [ ] The port's fake and its contract function live in `Tests/GbotUsageBarTestSupport`, and
+      the contract runs against both the fake (`GbotUsageBarCoreTests`) and the adapter
+      (`GbotUsageBarPlatformTests`).
 - [ ] No new `@unchecked Sendable`, `nonisolated(unsafe)`, or `try!`.

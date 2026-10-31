@@ -1,86 +1,83 @@
-# claude-usage-bar
+# gbot-usage-bar
 
-[![CI](https://github.com/tomada1114/claude-usage-bar/actions/workflows/ci.yml/badge.svg)](https://github.com/tomada1114/claude-usage-bar/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/tomada1114/claude-usage-bar/badge)](https://scorecard.dev/viewer/?uri=github.com/tomada1114/claude-usage-bar)
+[![CI](https://github.com/tomada1114/gbot-usage-bar/actions/workflows/ci.yml/badge.svg)](https://github.com/tomada1114/gbot-usage-bar/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/tomada1114/gbot-usage-bar/badge)](https://scorecard.dev/viewer/?uri=github.com/tomada1114/gbot-usage-bar)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-ClaudeUsageBar is a macOS menu-bar app that shows your Claude Code **weekly usage
-limit** as a number in the menu bar — `76` means 76% of this week's limit is used.
-The menu can switch the number to the five-hour limit instead. Click it for the details:
+GbotUsageBar is a macOS menu-bar app that shows the **weekly usage limit** of the
+Grok Bot desktop app as a number in the menu bar — `76` means 76% of this week's limit
+is used. Click it for the details:
+
+> **Unofficial.** This is a personal tool. It is not affiliated with, endorsed by, or
+> supported by xAI. It only reads a cache file the desktop app already keeps on your Mac.
 
 ```text
 Weekly: 76%
-Resets Wed 21:00
-─────────────
-5-hour: 19%
-Resets 22:00
-─────────────
-Show in Menu Bar
-  ✓ Weekly
-    5-hour
+Resets Sat 7 Nov at 09:58
 ─────────────
 Updated 14:05
-Quit ClaudeUsageBar   ⌘Q
+Quit GbotUsageBar   ⌘Q
 ```
 
-The number sits inside the outline of Clawd, Claude Code's pixel mascot, which follows
-the menu bar's light, dark, and tinted appearance; it reads `--` until the first refresh
-succeeds. The weekly/five-hour choice lasts until the app quits; every launch starts on
-the weekly limit. The app refreshes at launch and every minute. When a refresh fails, the
-menu keeps the last good numbers and adds one line saying why: not signed in to Claude
-Code, sign-in expired (open Claude Code to renew it), the server could not be reached,
-or it answered with something unexpected.
+The number sits inside a thin rounded rectangle that follows the menu bar's light, dark,
+and tinted appearance; it reads `--` until the first good read. The app re-reads the
+cache at launch and every minute. When a read fails, or the numbers may be stale, the
+menu keeps the last good numbers and adds one line saying why: no saved usage (open the
+desktop app and sign in), the cache could not be read, its format is unexpected, or the
+numbers may be out of date (open the desktop app to refresh them).
 
 ## Requirements
 
 - macOS 14 or later.
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) signed in on this Mac
-  with a Claude subscription, so its `Claude Code-credentials` item is in your login
-  keychain.
+- The desktop app installed, signed in, and opened at least once on this Mac.
 - To build: Xcode 26.5+, [mise](https://mise.jdx.dev/), and [Just](https://just.systems)
   (`brew install mise just`).
 
 ## Build and run
 
 ```bash
-git clone https://github.com/tomada1114/claude-usage-bar.git
-cd claude-usage-bar
+git clone https://github.com/tomada1114/gbot-usage-bar.git
+cd gbot-usage-bar
 mise trust     # approve mise.toml once — mise refuses untrusted configs
 just install   # pinned tools via mise + git hooks + xcodegen generate
 just run       # build (Debug) and launch; the badge appears in the menu bar
 ```
 
-`just logs` streams the app's log (the `usage` category says whether each refresh
-succeeded, and why not). Quit from the menu, or `pkill -x ClaudeUsageBar`.
+`just logs` streams the app's log (the `usage` category says whether each read
+succeeded, and why not). Quit from the menu, or `pkill -x GbotUsageBar`.
 
-The app runs without the App Sandbox, so it can run `/usr/bin/security` and reach
-the usage endpoint; [ADR-0002](docs/architecture/adr/0002-sandbox-posture.md) records
-why.
+The app runs without the App Sandbox, so it can read another application's folder
+under `~/Library/Application Support/`;
+[ADR-0002](docs/architecture/adr/0002-sandbox-posture.md) records why.
 
 ## How it gets the numbers — and the caveat
 
-1. It runs `/usr/bin/security find-generic-password -s "Claude Code-credentials" -w`
-   and reads `claudeAiOauth.accessToken` from the JSON Claude Code keeps there.
-2. It sends `GET https://api.anthropic.com/api/oauth/usage` with that token and shows
-   the `seven_day` and `five_hour` utilization and reset times.
+The desktop app saves the weekly usage it fetched as unencrypted JSON in
+`~/Library/Application Support/Grok Bot/sand-client-persistence/`, one `.blob` file per
+entry, named by the entry's key in lowercase base32 without padding. The app:
 
-**That endpoint is undocumented.** It is the one Claude Code itself uses; Anthropic does
-not publish it, and it can change or disappear without notice — the app would then show
-"Unexpected response from the usage server". The app never refreshes the token: when it
-expires, running Claude Code renews it. Details and alternatives:
-[ADR-0003](docs/architecture/adr/0003-usage-data-source.md).
+1. reads `sand.client.slice.client-meta.account-slot` for the signed-in account's slot;
+2. reads `sand.client.slice.account.<slot, percent-encoded>.weekly-usage.cache` and
+   shows its `percentUsed` (rounded, as the desktop app's Usage page does) and
+   `nextResetMs`;
+3. shows `readAtMs` as "Updated", and flags the numbers as out of date once
+   `expiresAtMs` has passed (the numbers stay) or the weekly reset has passed (they
+   show `--`).
+
+**The numbers are only as fresh as the desktop app's last fetch**, and while it is
+not running they do not change. **The cache format is undocumented** and can change
+with any desktop app update; the menu would then say "Unexpected usage cache format".
 
 ## Privacy
 
-- The token is read from your keychain on this Mac at each refresh and is sent only to
-  `api.anthropic.com`, in that one request. It is never written to disk, cached, or
-  logged; the type that carries it prints as `<redacted>`.
-- The app reads nothing else from the keychain item (the refresh token included), sends
-  no analytics, and keeps no state between launches.
+- The app makes no network request, never touches the keychain or the desktop app's
+  sign-in, and never writes, creates, or deletes anything in the desktop app's folder.
+- It reads exactly two files, and logs neither their contents nor the account slot.
+  It sends no analytics and keeps no state between launches.
 
 ## Non-goals
 
-No colors or thresholds, notifications, other limits or model breakdowns, token refresh,
+No colors or thresholds, notifications, limits beyond the weekly one, network requests,
 manual refresh item, Windows or Linux build, or Mac App Store release. The full list, and
 where each decision is recorded, is `AGENTS.md` › Product.
 
@@ -91,7 +88,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and the pull request process, a
 
 ```bash
 just check        # verify-hooks → fmt → lint → test-scripts → check-harness → test → build
-just test-local   # the adapter tests against the real keychain and endpoint (needs Claude Code signed in)
+just test-local   # the adapter tests against the real file system and the desktop app's cache
 just uitest       # the launch test: the status item and its Quit item
 just smoke        # Release build launches and stays alive
 ```
@@ -144,7 +141,7 @@ not a dependency — adopt the changes that earn their place.
 This app is built on [macos-app-template](https://github.com/tomada1114/macos-app-template),
 and the repository keeps the template's reasoning here: every choice below has a
 reason, so a disagreement names exactly what to change. The app's own decisions —
-its shape, its sandbox posture, and its data source — are ADRs under
+its shape and its sandbox posture — are ADRs under
 [`docs/architecture/`](docs/architecture/README.md).
 
 ### Why XcodeGen with a gitignored `.xcodeproj`?
@@ -159,16 +156,16 @@ away from if that ever matters.
 ### Why a thin app shell + local Swift package?
 
 `App/` contains only the `@main` entry point and resources. Everything real
-lives in `Packages/ClaudeUsageBarKit`, so tests run with plain `swift test` — no
+lives in `Packages/GbotUsageBarKit`, so tests run with plain `swift test` — no
 simulator, no signing, no Xcode project required. Precedent: pointfreeco's
 isowords.
 
 ### Why the Core/UI/Platform split and a coverage floor on Core only?
 
-`ClaudeUsageBarCore` holds all logic and never imports a UI or OS-integration framework
+`GbotUsageBarCore` holds all logic and never imports a UI or OS-integration framework
 (SwiftUI, AppKit, UIKit, Cocoa, ApplicationServices, Carbon, ServiceManagement —
-a lint rule and a test both enforce it); `ClaudeUsageBarUI` holds thin
-views; `ClaudeUsageBarPlatform` holds the adapters that do talk to the OS, each behind a
+a lint rule and a test both enforce it); `GbotUsageBarUI` holds thin
+views; `GbotUsageBarPlatform` holds the adapters that do talk to the OS, each behind a
 protocol Core declares, so a test can substitute a fake and `App/` decides which
 implementation the app gets (`docs/architecture.md`). The 80% line-coverage and 75%
 function-coverage floors apply to Core only — that is what makes a
@@ -182,7 +179,7 @@ no test calls cannot hide under the line floor.
 User-facing wording is a decision like any other, so it lives where the
 coverage floor sees it: Core view models return `LocalizedStringResource`
 (Foundation, not a UI framework), and the one `Localizable.xcstrings` sits in
-`ClaudeUsageBarCore` beside them. Views render those resources and carry no literal of
+`GbotUsageBarCore` beside them. Views render those resources and carry no literal of
 their own, because a SwiftUI literal is looked up in the app's main bundle, not
 the package's. The template ships English alone — `defaultLocalization: "en"`
 and one catalog — since a second language makes every later string owe a
@@ -202,8 +199,8 @@ Testing.
 ### Why zero dependencies?
 
 An app template should not impose opinions about networking, persistence, or
-update frameworks. This app still needs none: `URLSession`, `Process`, and
-Foundation's formatters cover it. docs/architecture.md lists vetted suggestions
+update frameworks. This app still needs none: Foundation's file reading, JSON
+decoding, and formatters cover it. docs/architecture.md lists vetted suggestions
 (ViewInspector, swift-snapshot-testing, Sparkle) and when they earn their place.
 
 ### Why Just?

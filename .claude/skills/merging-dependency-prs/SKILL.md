@@ -54,7 +54,7 @@ If both lists are empty, say so and stop. Expected shapes:
 
 | Bot | Ecosystem | Touches | Title prefix |
 |---|---|---|---|
-| Dependabot | SwiftPM | `Packages/ClaudeUsageBarKit/Package.resolved` (and `Package.swift` for a range change) | `deps:` |
+| Dependabot | SwiftPM | `Packages/GbotUsageBarKit/Package.resolved` (and `Package.swift` for a range change) | `deps:` |
 | Dependabot | GitHub Actions | `.github/workflows/*.yml`, `.github/actions/**` | `ci:` |
 | Renovate | mise | `mise.toml` | `deps:` |
 
@@ -122,7 +122,7 @@ git switch -c deps/combined-<yyyy-mm-dd> origin/main
 Apply each PR's version change by hand, not by merging bot branches:
 
 - **SwiftPM:** edit `Package.swift` only if a PR changed a range, then
-  `swift package resolve --package-path Packages/ClaudeUsageBarKit` to regenerate
+  `swift package resolve --package-path Packages/GbotUsageBarKit` to regenerate
   `Package.resolved`. Commit `Package.resolved` with the change (the `smart-commit`
   skill bundles it).
 - **mise:** edit `mise.toml`, then `mise install` so the pinned version actually exists.

@@ -14,7 +14,7 @@
 #     of identifier characters and `|` that is directly followed by `\b` — in today's
 #     regex `(SwiftUI|AppKit|…|ServiceManagement)\b`. A regex split across lines, or
 #     one whose module group is not followed by `\b`, is not seen.
-#   - <root>/Packages/ClaudeUsageBarKit/Tests/ClaudeUsageBarCoreTests/ArchitectureBoundaryTests.swift:
+#   - <root>/Packages/GbotUsageBarKit/Tests/GbotUsageBarCoreTests/ArchitectureBoundaryTests.swift:
 #     the array literal assigned to `forbiddenModules` — from the `[` after
 #     `forbiddenModules … =` to the first `]`, on one line or several. Every
 #     double-quoted string literal in that span is a module; a `// …` comment is
@@ -39,7 +39,7 @@ set -euo pipefail
 check_parse_args "scripts/checks/core-ban-lists-agree.sh" "$@"
 
 LINT=".swiftlint.yml"
-TESTS="Packages/ClaudeUsageBarKit/Tests/ClaudeUsageBarCoreTests/ArchitectureBoundaryTests.swift"
+TESTS="Packages/GbotUsageBarKit/Tests/GbotUsageBarCoreTests/ArchitectureBoundaryTests.swift"
 check_require_file "${LINT}"
 check_require_file "${TESTS}"
 

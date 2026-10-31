@@ -14,14 +14,14 @@ trap cleanup_temp EXIT
 RESET_SH="${REPO_ROOT}/scripts/reset-permissions.sh"
 
 # make_fixture_root [IDENTIFIER] — a directory holding a project.yml that declares
-# IDENTIFIER (io.github.tomada1114.ClaudeUsageBar by default); with the empty string, none at all.
+# IDENTIFIER (io.github.tomada1114.GbotUsageBar by default); with the empty string, none at all.
 make_fixture_root() {
-    local root identifier="${1-io.github.tomada1114.ClaudeUsageBar}"
+    local root identifier="${1-io.github.tomada1114.GbotUsageBar}"
     root=$(cd "$(make_temp_dir)" && pwd)
     {
-        echo "name: ClaudeUsageBar"
+        echo "name: GbotUsageBar"
         echo "targets:"
-        echo "  ClaudeUsageBar:"
+        echo "  GbotUsageBar:"
         echo "    type: application"
         echo "    settings:"
         echo "      base:"
@@ -48,8 +48,8 @@ case_resets_the_declared_identifier() {
     stub_command tccutil 'exit 0'
     capture "${RESET_SH}" --root "${root}"
     assert_exit 0
-    assert_tccutil_called_with "reset All io.github.tomada1114.ClaudeUsageBar"
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_tccutil_called_with "reset All io.github.tomada1114.GbotUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
 }
 
 # The identifier comes from the manifest, so a bootstrapped app resets its own.

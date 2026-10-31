@@ -14,7 +14,7 @@ description: >
 # Changing Gates
 
 **Owns:** a change to a file that enforces rather than implements — `.swiftlint.yml`,
-`.swiftformat`, `Packages/ClaudeUsageBarKit/Package.swift`'s `strictSettings`, `mise.toml`,
+`.swiftformat`, `Packages/GbotUsageBarKit/Package.swift`'s `strictSettings`, `mise.toml`,
 `.githooks/pre-commit`, `scripts/lint.sh`, `scripts/coverage.sh`, the commit-time guard
 under `scripts/guard/`, and `.github/workflows/*.yml` — and which gate can see a given change at all. **Does not
 own:** adding a package dependency (the Dependency Policy in `.claude/rules/project.md`);
@@ -64,7 +64,7 @@ is incomplete, and removing a rule needs explicit approval
 a reason when only one site needs the exception — a global disable widens the gate for
 every future file. Repository-specific rules live under `custom_rules:`; there are two.
 
-`no_ui_import_in_core` keeps `ClaudeUsageBarCore` from importing a UI or OS-integration
+`no_ui_import_in_core` keeps `GbotUsageBarCore` from importing a UI or OS-integration
 framework, and its module list changes together with `ArchitectureBoundaryTests`'
 `forbiddenModules` in one commit; `no_print_in_sources` rejects `print(`,
 `debugPrint(`, and `NSLog(` in shipped sources. Before editing either
@@ -106,10 +106,10 @@ entry on that PR, never to skip the bump silently. The Xcode pin lives in
 
 ## `scripts/coverage.sh`
 
-It gates on line and function coverage of `Sources/ClaudeUsageBarCore/` only, by filtering
-llvm-cov's report to that path. `ClaudeUsageBarUI` and `ClaudeUsageBarPlatform` are outside it because an adapter or a view
+It gates on line and function coverage of `Sources/GbotUsageBarCore/` only, by filtering
+llvm-cov's report to that path. `GbotUsageBarUI` and `GbotUsageBarPlatform` are outside it because an adapter or a view
 holds translation rather than a decision (`docs/architecture.md` › Ports and adapters) —
-not because nothing links them: `ClaudeUsageBarPlatformTests` links `ClaudeUsageBarPlatform`, and its
+not because nothing links them: `GbotUsageBarPlatformTests` links `GbotUsageBarPlatform`, and its
 tests are skipped unless `RUN_LOCAL_MACHINE_TESTS=1` (`just test-local`), so they add no
 coverage under `just test` either way. Measuring Platform would therefore gate on
 whether a human opted in, which is why the filter is a path and not a target list. The
@@ -191,9 +191,9 @@ Nothing boots the app and asserts behavior beyond two checks: `scripts/smoke_lau
 (`just smoke`) builds Release, verifies the code signature, launches the binary, and
 asserts only that the process stays alive; `LaunchUITests/LaunchTests.swift`
 (`just uitest`) asserts that the app's status item appears and that clicking it opens a
-menu holding the Quit item. Any other UI behavior, `ClaudeUsageBarUI` and `ClaudeUsageBarPlatform` code paths (both outside
+menu holding the Quit item. Any other UI behavior, `GbotUsageBarUI` and `GbotUsageBarPlatform` code paths (both outside
 the coverage floor — an adapter's real OS call is exercised by no *gate*: it has a test,
-in `Tests/ClaudeUsageBarPlatformTests`, that only a human runs with `just test-local`, because a
+in `Tests/GbotUsageBarPlatformTests`, that only a human runs with `just test-local`, because a
 runner has no GUI session and no TCC grants), the signed and notarized release (built only on a tag push by `release.yml`), and
 entitlements or signing settings are places a change can be wrong while every gate
 passes. Debug signing is now one of those settings: `Config/Debug.xcconfig` may

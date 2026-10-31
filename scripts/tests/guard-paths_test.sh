@@ -75,7 +75,7 @@ case_secrets_substring_allowed() {
 
 case_signing_material_blocked() {
     expect_blocked Signing/DeveloperID.p12 cert.pfx AuthKey_ABC123.p8 \
-        ClaudeUsageBar.provisionprofile ClaudeUsageBar.mobileprovision build.keychain login.keychain-db \
+        GbotUsageBar.provisionprofile GbotUsageBar.mobileprovision build.keychain login.keychain-db \
         Cert.P12
 }
 
@@ -94,9 +94,9 @@ case_other_xcconfigs_allowed() {
 }
 
 case_public_and_ordinary_files_allowed() {
-    expect_allowed App/ClaudeUsageBar.entitlements cert.cer Signing/Request.certSigningRequest \
+    expect_allowed App/GbotUsageBar.entitlements cert.cer Signing/Request.certSigningRequest \
         Slides.key Package.resolved README.md cert.pem \
-        Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarCore/UsageMenuViewModel.swift
+        Packages/GbotUsageBarKit/Sources/GbotUsageBarCore/UsageMenuViewModel.swift
 }
 
 run_case "every .env and .env.* is blocked" case_env_files_blocked

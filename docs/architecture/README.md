@@ -59,4 +59,4 @@ nothing. `steering-the-roadmap` is the skill that changes it.
 |---|---|---|
 | [0001](adr/0001-app-shape.md) | A menu-bar agent with a native menu | Proposed |
 | [0002](adr/0002-sandbox-posture.md) | Run without the App Sandbox | Accepted |
-| [0003](adr/0003-usage-data-source.md) | Usage from Claude Code's keychain token and the OAuth usage endpoint | Proposed |
+| [0003](adr/0003-usage-data-source.md) | Usage from Claude Code's keychain token and the OAuth usage endpoint | Superseded — the app now reads the desktop app's local cache (`README.md`) |

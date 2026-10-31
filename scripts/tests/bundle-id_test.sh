@@ -13,9 +13,9 @@ BUNDLE_ID_SH="${REPO_ROOT}/scripts/bundle-id.sh"
 # write_manifest ROOT SETTINGS_BODY — a project.yml shaped like the real one.
 write_manifest() {
     cat >"$1/project.yml" <<EOF
-name: ClaudeUsageBar
+name: GbotUsageBar
 targets:
-  ClaudeUsageBar:
+  GbotUsageBar:
     type: application
     settings:
       base:
@@ -25,10 +25,10 @@ EOF
 
 case_reads_the_identifier() {
     root=$(make_temp_dir)
-    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBar'
+    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.GbotUsageBar'
     capture "${BUNDLE_ID_SH}" --root "${root}"
     assert_exit 0
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
 }
 
 case_reads_a_renamed_identifier() {
@@ -46,30 +46,30 @@ case_reads_a_renamed_identifier() {
 
 case_strips_quotes_and_trailing_space() {
     root=$(make_temp_dir)
-    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: "io.github.tomada1114.ClaudeUsageBar"   '
+    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: "io.github.tomada1114.GbotUsageBar"   '
     capture "${BUNDLE_ID_SH}" --root "${root}"
     assert_exit 0
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
     assert_stdout_not_contains '"' "the surrounding quotes"
 }
 
 case_strips_a_trailing_comment() {
     # XcodeGen accepts a YAML comment after the value, so this script must too.
     root=$(make_temp_dir)
-    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBar # the app id'
+    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.GbotUsageBar # the app id'
     capture "${BUNDLE_ID_SH}" --root "${root}"
     assert_exit 0
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
     assert_stdout_not_contains "#" "the comment"
     assert_stdout_not_contains "the app id" "the comment text"
 }
 
 case_strips_a_trailing_comment_after_quotes() {
     root=$(make_temp_dir)
-    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: "io.github.tomada1114.ClaudeUsageBar"   # the app id'
+    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: "io.github.tomada1114.GbotUsageBar"   # the app id'
     capture "${BUNDLE_ID_SH}" --root "${root}"
     assert_exit 0
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
     assert_stdout_not_contains '"' "the surrounding quotes"
     assert_stdout_not_contains "#" "the comment"
 }
@@ -84,17 +84,17 @@ case_comment_only_value() {
 
 case_takes_the_first_target() {
     root=$(make_temp_dir)
-    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBar'
+    write_manifest "${root}" '        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.GbotUsageBar'
     cat >>"${root}/project.yml" <<'EOF'
-  ClaudeUsageBarLaunchUITests:
+  GbotUsageBarLaunchUITests:
     type: bundle.ui-testing
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBarLaunchUITests
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.GbotUsageBarLaunchUITests
 EOF
     capture "${BUNDLE_ID_SH}" --root "${root}"
     assert_exit 0
-    assert_stdout_contains "io.github.tomada1114.ClaudeUsageBar"
+    assert_stdout_contains "io.github.tomada1114.GbotUsageBar"
     assert_stdout_not_contains "LaunchUITests" "the test bundle's identifier"
 }
 

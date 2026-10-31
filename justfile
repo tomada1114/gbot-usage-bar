@@ -14,7 +14,7 @@ install:
     @if command -v xcodebuild >/dev/null 2>&1; then xcode_local="$(xcodebuild -version | head -n1 | awk '{print $2}')"; xcode_pinned="$(cat .xcode-version)"; if [ "$xcode_local" != "$xcode_pinned" ]; then echo "warning: local Xcode $xcode_local differs from the CI-pinned $xcode_pinned — results may diverge from CI"; fi; fi
     just verify-hooks
 
-# Regenerate ClaudeUsageBar.xcodeproj from project.yml
+# Regenerate GbotUsageBar.xcodeproj from project.yml
 generate:
     mise exec -- xcodegen generate
 
@@ -50,7 +50,7 @@ test-scripts:
 check-harness:
     mise exec -- scripts/checks/run-all.sh
 
-# Run tests with the 80% line-coverage and 75% function-coverage floors on ClaudeUsageBarCore
+# Run tests with the 80% line-coverage and 75% function-coverage floors on GbotUsageBarCore
 test:
     scripts/coverage.sh
 
@@ -58,14 +58,14 @@ test:
 # for fast local iteration; `just test` is still the gate
 [doc("Run only the tests matching FILTER, with no coverage floor")]
 test-fast filter:
-    cd Packages/ClaudeUsageBarKit && swift test --filter '{{filter}}'
+    cd Packages/GbotUsageBarKit && swift test --filter '{{filter}}'
 
 # Build the app (Debug). 2>&1 keeps stderr off the terminal: there, swiftc passes
 # -fmessage-length=<width>, which splits the module cache per terminal width (#4)
 [doc("Build the app (Debug)")]
 build:
     mise exec -- xcodegen generate
-    set -o pipefail && xcodebuild -project ClaudeUsageBar.xcodeproj -scheme ClaudeUsageBar -configuration Debug -derivedDataPath build/dev-derived-data build 2>&1 | mise exec -- xcbeautify --quiet
+    set -o pipefail && xcodebuild -project GbotUsageBar.xcodeproj -scheme GbotUsageBar -configuration Debug -derivedDataPath build/dev-derived-data build 2>&1 | mise exec -- xcbeautify --quiet
 
 # Build (Debug), quit any running instance of this app, and launch the fresh
 # build, left running until you quit it (scripts/run-app.sh)
@@ -92,7 +92,7 @@ logs:
 uitest:
     mise exec -- xcodegen generate
     rm -rf build/LaunchUITests.xcresult
-    set -o pipefail && xcodebuild test -project ClaudeUsageBar.xcodeproj -scheme ClaudeUsageBar -destination 'platform=macOS' -derivedDataPath build/dev-derived-data -resultBundlePath build/LaunchUITests.xcresult 2>&1 | mise exec -- xcbeautify
+    set -o pipefail && xcodebuild test -project GbotUsageBar.xcodeproj -scheme GbotUsageBar -destination 'platform=macOS' -derivedDataPath build/dev-derived-data -resultBundlePath build/LaunchUITests.xcresult 2>&1 | mise exec -- xcbeautify
 
 # Build Release and assert the app launches and stays alive
 smoke:
@@ -113,7 +113,7 @@ agents-check:
 
 # Remove build artifacts and the generated project
 clean:
-    rm -rf build Packages/ClaudeUsageBarKit/.build ClaudeUsageBar.xcodeproj
+    rm -rf build Packages/GbotUsageBarKit/.build GbotUsageBar.xcodeproj
 
 # Create or update this repository's GitHub labels from .github/labels.yml
 # (never deletes). Requires `gh`, authenticated against this repository: it is
@@ -130,12 +130,12 @@ labels:
 ruleset:
     scripts/apply-ruleset.sh
 
-# Run the local-machine tests (ClaudeUsageBarPlatformTests): the adapter tests CI cannot run,
+# Run the local-machine tests (GbotUsageBarPlatformTests): the adapter tests CI cannot run,
 # because a runner has no logged-in GUI session and cannot be granted the permissions
 # below. Sets RUN_LOCAL_MACHINE_TESTS=1, the opt-in the `.requiresLocalMachine` trait
 # reads, so these run here and stay reported-as-skipped everywhere else. No coverage
 # floor: adapters translate rather than decide, so `scripts/coverage.sh` still measures
-# ClaudeUsageBarCore only, and `just test` is still the gate.
+# GbotUsageBarCore only, and `just test` is still the gate.
 #
 # Grants: today's suite needs none — NSWorkspace only needs a GUI session. A test that
 # reaches for Accessibility, Input Monitoring, or Screen Recording needs that permission
@@ -147,9 +147,9 @@ ruleset:
 #
 # Run it before a PR that touches an adapter, and paste the result in the PR: no gate
 # can do it for you.
-[doc("Run the local-machine adapter tests (ClaudeUsageBarPlatformTests) CI cannot run")]
+[doc("Run the local-machine adapter tests (GbotUsageBarPlatformTests) CI cannot run")]
 test-local:
-    cd Packages/ClaudeUsageBarKit && RUN_LOCAL_MACHINE_TESTS=1 swift test --filter 'ClaudeUsageBarPlatformTests'
+    cd Packages/GbotUsageBarKit && RUN_LOCAL_MACHINE_TESTS=1 swift test --filter 'GbotUsageBarPlatformTests'
 
 # Prepare a release — `just release-prep <version>`, plus `--dry-run` to check
 # without writing: sets MARKETING_VERSION, increments CURRENT_PROJECT_VERSION, and

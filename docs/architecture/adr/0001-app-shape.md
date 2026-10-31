@@ -6,14 +6,14 @@
 
 ## Context
 
-ClaudeUsageBar exists to keep one number — the Claude Code weekly usage percentage — in
+GbotUsageBar exists to keep one number — the Claude Code weekly usage percentage — in
 view at all times (`AGENTS.md` › Product). The template ships a windowed app: a
 `WindowGroup` scene, a Dock tile, and a launch test that waits for a window. A window the
 user must open to read one number defeats the point, so the shape is decided before any
 feature is built on it.
 
 The decision touches three places at once: `project.yml`'s `INFOPLIST_KEY_LSUIElement`,
-the scene in `App/ClaudeUsageBarApp.swift`, and the assertion in
+the scene in `App/GbotUsageBarApp.swift`, and the assertion in
 `LaunchUITests/LaunchTests.swift`. It also adds one Core port, `ApplicationTerminating`,
 because an agent app has no app menu and therefore no built-in way to quit.
 
@@ -32,7 +32,7 @@ because an agent app has no app menu and therefore no built-in way to quit.
 2. **A menu-bar agent with the `.window` style** — the same, with a SwiftUI panel instead
    of a menu.
 3. **A menu-bar agent built on `NSStatusItem`** — an AppKit delegate in
-   `ClaudeUsageBarPlatform` owning the status item.
+   `GbotUsageBarPlatform` owning the status item.
 4. **A windowed app** (the template's shape) — a small always-on-top window or a Dock
    badge.
 
@@ -45,7 +45,7 @@ from the menu for the current run — inside a thin
 outline of Clawd, Claude Code's pixel mascot, rendered into a template image so the menu
 bar tints it for light, dark, and highlighted states. Quit goes through the
 `ApplicationTerminating` port, answered by `NSApplicationTerminator` in
-`ClaudeUsageBarPlatform`, so `ClaudeUsageBarUI` never calls AppKit to end the process.
+`GbotUsageBarPlatform`, so `GbotUsageBarUI` never calls AppKit to end the process.
 
 - It beats option 2 because the menu holds only read-only lines and one command, which is
   what a native menu is for, and because XCUITest can see a `.menu` style's items (by

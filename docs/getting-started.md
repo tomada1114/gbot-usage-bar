@@ -18,13 +18,13 @@ clone needs `mise trust` first (interactively it prompts; non-interactive
 runs fail without it). `just install` then runs `mise install` (SwiftLint,
 SwiftFormat, XcodeGen, xcbeautify, actionlint, ShellCheck, typos — all pinned), points
 `core.hooksPath` at `.githooks/` for the fast pre-commit lint, and generates
-`ClaudeUsageBar.xcodeproj`.
+`GbotUsageBar.xcodeproj`.
 
 ## Everyday Commands
 
 ```bash
 just check     # the full local gate: verify-hooks → fmt → lint → test-scripts → check-harness → test → build
-just test      # Swift Testing suite + 80% line / 75% function coverage floors on ClaudeUsageBarCore
+just test      # Swift Testing suite + 80% line / 75% function coverage floors on GbotUsageBarCore
 just uitest    # XCUITest launch test (first local run may prompt for Accessibility)
 just smoke     # Release build + "does it actually launch" assertion
 ```
@@ -55,7 +55,7 @@ CODE_SIGN_STYLE = Manual
 CODE_SIGN_IDENTITY = Apple Development
 EOF
 just build
-codesign -d -r- build/dev-derived-data/Build/Products/Debug/ClaudeUsageBar.app
+codesign -d -r- build/dev-derived-data/Build/Products/Debug/GbotUsageBar.app
 ```
 
 Two details cost time if you guess them:
@@ -94,12 +94,11 @@ The template's two examples — a counter screen and a ports-and-adapters exampl
 read the frontmost app — were removed when this app was started. What replaced them is
 the pattern to copy now:
 
-- the menu-bar agent in `App/ClaudeUsageBarApp.swift`, rendering `UsageMenu` and
+- the menu-bar agent in `App/GbotUsageBarApp.swift`, rendering `UsageMenu` and
   `UsageBadgeLabel` over Core's `UsageMenuViewModel`
   (`docs/architecture/adr/0001-app-shape.md`);
-- the ports `OAuthTokenProviding` and `UsageFetching`, with their adapters
-  `SecurityCLITokenProvider` and `URLSessionUsageFetcher`, their fakes and contract
-  suites in `ClaudeUsageBarTestSupport`, and their local-machine tests
+- the port `CacheFileReading`, with its adapter `CacheFolderReader`, its fake and
+  contract suite in `GbotUsageBarTestSupport`, and its local-machine test
   (`docs/architecture.md` › Ports and adapters);
 - `LaunchUITests/LaunchTests.swift`, which asserts the status item and its Quit menu
   item rather than a window.
@@ -111,10 +110,10 @@ must keep.
 
 ```bash
 just generate
-open ClaudeUsageBar.xcodeproj
+open GbotUsageBar.xcodeproj
 ```
 
-Remember: `ClaudeUsageBar.xcodeproj` is generated from `project.yml` and gitignored.
+Remember: `GbotUsageBar.xcodeproj` is generated from `project.yml` and gitignored.
 Change targets/settings in `project.yml`, then `just generate`.
 
 ## App Icon

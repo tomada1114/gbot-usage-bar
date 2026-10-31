@@ -1,6 +1,8 @@
 # ADR-0003: Usage from Claude Code's keychain token and the OAuth usage endpoint
 
-- **Status:** Proposed
+- **Status:** Superseded (2026-10-31) — the app no longer reads a keychain token or calls
+  a usage endpoint; it reads the weekly usage a desktop app saves in its local cache, as
+  `README.md` describes. No ADR replaces this one; it is kept for the reasoning.
 - **Date:** 2026-09-29
 - **Deciders:** the owner
 
@@ -19,7 +21,7 @@ This ADR records that choice, the two Core ports it adds (`OAuthTokenProviding`,
   with no extra sign-in.
 - Never store, log, or send the token anywhere but `api.anthropic.com`.
 - Keep every decision (what a status or a body means, what the menu says) in
-  `ClaudeUsageBarCore`, where a test with a fake reaches it.
+  `GbotUsageBarCore`, where a test with a fake reaches it.
 - Put light, predictable load on an endpoint the app does not own.
 
 ## Considered options
@@ -58,7 +60,7 @@ Option 1.
   30-second `Tuning.requestTimeout`. A failure keeps the last good numbers on screen beside
   one line naming the failure.
 - **Ports.** `OAuthTokenProviding` and `UsageFetching` in Core, each with a fake and a
-  contract in `ClaudeUsageBarTestSupport`, checked against the real adapters by
+  contract in `GbotUsageBarTestSupport`, checked against the real adapters by
   `just test-local`.
 
 Option 2 lost because the app is not on the keychain item's access list, so the Security

@@ -75,7 +75,7 @@ What stays with you is the judgment no pattern can make:
   with an embedded token, a customer's personal data.
 - Something the user plainly did not mean to commit, secret or not.
 
-Also never commit generated artifacts: `ClaudeUsageBar.xcodeproj/`, `.build/`, `build/`
+Also never commit generated artifacts: `GbotUsageBar.xcodeproj/`, `.build/`, `build/`
 (all gitignored — if one shows up as untracked, something is wrong; investigate
 instead of committing it).
 
@@ -150,7 +150,7 @@ EOF
 **Examples:**
 
 ```
-feat(core): show when the five-hour window resets
+feat(core): show when the weekly window resets
 fix: keep the last good numbers when a refresh fails
 test: add parameterized tests for boundary values
 docs: update architecture guide for new module

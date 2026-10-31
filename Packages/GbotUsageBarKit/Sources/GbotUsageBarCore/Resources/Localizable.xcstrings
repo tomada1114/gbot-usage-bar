@@ -1,0 +1,127 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "badge.accessibility" : {
+      "comment" : "VoiceOver label for the menu bar item. The argument is the weekly usage, a whole percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly usage %lld percent"
+          }
+        }
+      }
+    },
+    "badge.accessibility.unavailable" : {
+      "comment" : "VoiceOver label for the menu bar item when the weekly usage is not known.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly usage unavailable"
+          }
+        }
+      }
+    },
+    "failure.cacheUnreadable" : {
+      "comment" : "Menu line when a cache file exists but could not be read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t read the desktop app’s usage cache"
+          }
+        }
+      }
+    },
+    "failure.noCachedUsage" : {
+      "comment" : "Menu line when the desktop app has saved no usage for a signed-in account.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved usage — open the desktop app and sign in"
+          }
+        }
+      }
+    },
+    "failure.outOfDate" : {
+      "comment" : "Menu line when the cached usage is expired or from before the weekly reset.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usage may be out of date — open the desktop app to refresh it"
+          }
+        }
+      }
+    },
+    "failure.unexpectedFormat" : {
+      "comment" : "Menu line when the desktop app's cache holds something this app cannot read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unexpected usage cache format"
+          }
+        }
+      }
+    },
+    "menu.quit" : {
+      "comment" : "Menu item that quits the app. GbotUsageBar is the app's name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit GbotUsageBar"
+          }
+        }
+      }
+    },
+    "menu.resets" : {
+      "comment" : "Line saying when the weekly usage limit resets. The argument is a weekday, a date, and a time.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resets %@"
+          }
+        }
+      }
+    },
+    "menu.updated" : {
+      "comment" : "Menu line saying when the usage was last fetched. The argument is a time, or a weekday and a time.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updated %@"
+          }
+        }
+      }
+    },
+    "menu.weekly" : {
+      "comment" : "Menu line for the weekly usage limit. The argument is a formatted percentage, such as 76%.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly: %@"
+          }
+        }
+      }
+    },
+    "menu.weekly.unavailable" : {
+      "comment" : "Menu line for the weekly usage limit when its value is not known.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weekly: --"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

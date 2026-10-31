@@ -5,7 +5,7 @@ comment block anywhere in the body:
 
 ```
 <!-- ship: tier=P1 area=core blocked-by=none blocks=#98
-     touches=Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarCore/,Packages/ClaudeUsageBarKit/Tests/ClaudeUsageBarCoreTests/ design=settled -->
+     touches=Packages/GbotUsageBarKit/Sources/GbotUsageBarCore/,Packages/GbotUsageBarKit/Tests/GbotUsageBarCoreTests/ design=settled -->
 ```
 
 Nothing here is required, and a repo with no contracts works exactly as before --

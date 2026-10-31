@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run the ClaudeUsageBarKit test suite with code coverage and enforce a line-coverage floor
-# and a function-coverage floor on Sources/ClaudeUsageBarCore. The report below is filtered
-# to that path, so ClaudeUsageBarUI and ClaudeUsageBarPlatform are outside it rather than measured
+# Run the GbotUsageBarKit test suite with code coverage and enforce a line-coverage floor
+# and a function-coverage floor on Sources/GbotUsageBarCore. The report below is filtered
+# to that path, so GbotUsageBarUI and GbotUsageBarPlatform are outside it rather than measured
 # and waived. The floors are
-# honest because all logic lives in Core: views render it and ClaudeUsageBarPlatform adapters
+# honest because all logic lives in Core: views render it and GbotUsageBarPlatform adapters
 # only translate for it, so neither holds a decision a test could catch
-# (AGENTS.md > Architecture). ClaudeUsageBarPlatformTests does link ClaudeUsageBarPlatform, but its
+# (AGENTS.md > Architecture). GbotUsageBarPlatformTests does link GbotUsageBarPlatform, but its
 # tests are skipped unless RUN_LOCAL_MACHINE_TESTS=1 (`just test-local`) — so they
 # contribute nothing here, and measuring Platform would gate the build on whether a
 # human opted in.
@@ -31,7 +31,7 @@
 # Errors (each followed by Expected:/Actual:/Next: lines, exit 1):
 #   ERR_COVERAGE_OVERRIDE_REMOVED       COVERAGE_MIN is set; it is no longer read,
 #                                       and the script stops before running any test
-#   ERR_COVERAGE_FUNCTIONS_BELOW_FLOOR  ClaudeUsageBarCore function coverage is below
+#   ERR_COVERAGE_FUNCTIONS_BELOW_FLOOR  GbotUsageBarCore function coverage is below
 #                                       FUNCTION_COVERAGE_FLOOR
 # A line coverage below COVERAGE_FLOOR predates this contract and exits non-zero
 # with a one-line message from the embedded Python instead.
@@ -50,7 +50,7 @@ if [ -n "${COVERAGE_MIN+set}" ]; then
     exit 1
 fi
 
-cd "$(dirname "$0")/../Packages/ClaudeUsageBarKit"
+cd "$(dirname "$0")/../Packages/GbotUsageBarKit"
 
 swift test --enable-code-coverage
 CODECOV_JSON="$(swift test --show-codecov-path)"
@@ -70,7 +70,7 @@ def percent(summary):
 lines = {"covered": 0, "count": 0}
 functions = {"covered": 0, "count": 0}
 for f in data["data"][0]["files"]:
-    if "/Sources/ClaudeUsageBarCore/" not in f["filename"]:
+    if "/Sources/GbotUsageBarCore/" not in f["filename"]:
         continue
     for total, key in ((lines, "lines"), (functions, "functions")):
         total["covered"] += f["summary"][key]["covered"]
@@ -80,12 +80,12 @@ for f in data["data"][0]["files"]:
         f'functions {percent(f["summary"]["functions"]):.1f}%'
     )
 if lines["count"] == 0:
-    sys.exit("coverage: no ClaudeUsageBarCore files found — gate misconfigured")
+    sys.exit("coverage: no GbotUsageBarCore files found — gate misconfigured")
 line_pct = percent(lines)
 function_pct = percent(functions)
-print(f"ClaudeUsageBarCore line coverage: {line_pct:.1f}% (floor {line_floor}%)")
+print(f"GbotUsageBarCore line coverage: {line_pct:.1f}% (floor {line_floor}%)")
 print(
-    f"ClaudeUsageBarCore function coverage: {function_pct:.1f}% "
+    f"GbotUsageBarCore function coverage: {function_pct:.1f}% "
     f'({functions["covered"]} of {functions["count"]} functions; floor {function_floor}%)'
 )
 
@@ -96,13 +96,13 @@ failed = False
 if function_pct < function_floor:
     failed = True
     for message in (
-        f"ERR_COVERAGE_FUNCTIONS_BELOW_FLOOR: ClaudeUsageBarCore function coverage "
+        f"ERR_COVERAGE_FUNCTIONS_BELOW_FLOOR: GbotUsageBarCore function coverage "
         f"{function_pct:.2f}% is below the {function_floor}% floor",
-        f"Expected: at least {function_floor}% of ClaudeUsageBarCore functions run under "
+        f"Expected: at least {function_floor}% of GbotUsageBarCore functions run under "
         "`just test` (FUNCTION_COVERAGE_FLOOR in scripts/coverage.sh)",
         f'Actual: {functions["covered"]} of {functions["count"]} functions ran '
         f"({function_pct:.2f}%)",
-        "Next: add a ClaudeUsageBarCore test that calls the uncovered functions in the files "
+        "Next: add a GbotUsageBarCore test that calls the uncovered functions in the files "
         "listed above, then rerun `just test`; the floor is never lowered (AGENTS.md).",
     ):
         print(message, file=sys.stderr)

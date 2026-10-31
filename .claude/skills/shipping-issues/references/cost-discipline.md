@@ -213,7 +213,7 @@ Implement it directly when **all** of these hold:
 - there is no exploration to do -- nothing to search for, no unfamiliar module
   to learn;
 - the verification is a command whose output this session reads anyway
-  (`just test-fast UsageResponseTests`, `just lint`, the gate);
+  (`just test-fast UsageCacheTests`, `just lint`, the gate);
 - it is not foundational by the test above. A three-line change to an interface
   or a gate is still foundational -- size is not the same question as blast
   radius, and this floor never overrides that section.

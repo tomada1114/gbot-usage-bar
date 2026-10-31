@@ -25,7 +25,7 @@ paths:
   - **Build-time code** — whether it ships a binary target or a build/command plugin (code
     that runs at build time); either needs explicit human approval
   - **Platforms** — its platform floor is at or below this package's `.macOS(.v14)`
-    (`platforms:` in `Packages/ClaudeUsageBarKit/Package.swift`)
+    (`platforms:` in `Packages/GbotUsageBarKit/Package.swift`)
   - **Advisories** — no open security advisory against the version being added
 - Allowed licenses (SPDX): MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, Zlib.
   `.github/workflows/dependency-review.yml` enforces this exact list (`allow-licenses`) on
@@ -39,18 +39,18 @@ paths:
   `Package.resolved` pins the exact version, so a range plus the resolved file reproduces
   the build
 - Add or bump one by editing `Package.swift` and running `swift package resolve` (or
-  `swift package update <Name>`) inside `Packages/ClaudeUsageBarKit` — never hand-edit
+  `swift package update <Name>`) inside `Packages/GbotUsageBarKit` — never hand-edit
   `Package.resolved`: a hand-written entry states a revision nobody verified
 - Verify with `just check`
 
 ## Gates
 
-- NEVER lower a coverage floor (currently 80% of lines and 75% of functions on ClaudeUsageBarCore)
+- NEVER lower a coverage floor (currently 80% of lines and 75% of functions on GbotUsageBarCore)
 - NEVER remove SwiftLint rules without explicit user approval
 
 ## Project Generation
 
-- `project.yml` is the source of truth; `ClaudeUsageBar.xcodeproj` is generated and gitignored —
+- `project.yml` is the source of truth; `GbotUsageBar.xcodeproj` is generated and gitignored —
   never hand-edit or commit it
 - After changing `project.yml`, run `just generate` and build to verify
 - `Config/Debug.xcconfig` holds only what `project.yml` cannot express — the optional

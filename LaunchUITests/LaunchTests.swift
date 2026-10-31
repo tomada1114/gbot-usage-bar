@@ -7,7 +7,7 @@ import XCTest
 /// whole visible surface.
 ///
 /// XCTest by necessity — Apple has not ported UI automation to Swift Testing.
-/// All other tests use Swift Testing in Packages/ClaudeUsageBarKit.
+/// All other tests use Swift Testing in Packages/GbotUsageBarKit.
 final class LaunchTests: XCTestCase {
     private enum Timeout {
         static let statusItemAppears: TimeInterval = 10
@@ -36,7 +36,7 @@ final class LaunchTests: XCTestCase {
         // SwiftUI accessibility identifier on a menu `Button` is dropped. Quit is the one
         // entry present in every state, so it proves the scene's content is wired.
         statusItem.click()
-        let quit = app.menuItems["Quit ClaudeUsageBar"]
+        let quit = app.menuItems["Quit GbotUsageBar"]
         XCTAssertTrue(quit.waitForExistence(timeout: Timeout.menuOpens))
         app.typeKey(.escape, modifierFlags: [])
     }

@@ -2,9 +2,9 @@
 name: localizing-the-app
 description: >
   Covers every string a person reads and its translation, meaning the String Catalog at
-  Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarCore/Resources/Localizable.xcstrings, defaultLocalization
+  Packages/GbotUsageBarKit/Sources/GbotUsageBarCore/Resources/Localizable.xcstrings, defaultLocalization
   in Package.swift, Core view models returning LocalizedStringResource with bundle .module,
-  Text(verbatim:) in ClaudeUsageBarUI, LocalizationTests, and xcodebuild -exportLocalizations. Use
+  Text(verbatim:) in GbotUsageBarUI, LocalizationTests, and xcodebuild -exportLocalizations. Use
   when adding or changing user-facing wording, a Text or Button title, a catalog key,
   comment, plural, or translation; when a string shows its key, reads right in English but
   never translates, or a catalog key goes stale; or when an app considers a second
@@ -30,8 +30,8 @@ English-only rule and its one exception (`AGENTS.md`'s "Important Reminders").
   (Foundation, which Core may import) and a view renders it. The wording then sits under
   the coverage floor, where a test asserts it; a Core API that handed out bare keys would
   leave the view to know the key, the bundle, and the fallback, none of it tested.
-- **One catalog, in Core.** `ClaudeUsageBarCore` declares `resources: [.process(...)]` for it;
-  `ClaudeUsageBarUI` has no catalog and no resources.
+- **One catalog, in Core.** `GbotUsageBarCore` declares `resources: [.process(...)]` for it;
+  `GbotUsageBarUI` has no catalog and no resources.
 
 ## Declaring a string
 
@@ -55,7 +55,7 @@ Every part is there for a reason:
 - **`defaultValue`.** `swift test` (`just test`) builds with SwiftPM's native build
   system, which copies the `.xcstrings` into Core's bundle uncompiled, so the English a
   test sees comes from here. Without it a test would see the key.
-- **An explicit key**, `feature.purpose` (`menu.quit`, `failure.notSignedIn`),
+- **An explicit key**, `feature.purpose` (`menu.quit`, `failure.noCachedUsage`),
   not the English text: the English can be polished without re-keying every translation,
   and a key is something a test and a search can name.
 - **`comment`** is a translator's only context: where the text appears and what each
@@ -70,11 +70,11 @@ Every part is there for a reason:
   SwiftPM's native build does not, so code that names one fails to compile under
   `just test`.
 
-## In `ClaudeUsageBarUI`
+## In `GbotUsageBarUI`
 
 - A view has no localizable literal. `Text("…")` and `Button("…")` take a
   `LocalizedStringKey` that is looked up in the app's main bundle, not the package's, and
-  `-exportLocalizations` exports it under a `ClaudeUsageBarUI` strings file that has nowhere to
+  `-exportLocalizations` exports it under a `GbotUsageBarUI` strings file that has nowhere to
   ship. Render a Core resource instead: `Text(presentation.weeklyUsage)`,
   `Button(UsagePresentation.quitTitle, action: quit)`.
 - What is not language is `Text(verbatim:)`: a number (formatted in Core with an injected
@@ -87,21 +87,21 @@ Every part is there for a reason:
 
 - A new or changed key lands in the Core code, `Localizable.xcstrings`, and
   `LocalizationTests.everyCase()` in the same change. The suite scans every
-  `LocalizedStringResource(…)` call in `Sources/ClaudeUsageBarCore` (`ResourceDeclarationScan`)
+  `LocalizedStringResource(…)` call in `Sources/GbotUsageBarCore` (`ResourceDeclarationScan`)
   and fails until all three agree: a call without an explicit key, a `defaultValue`, or
   `bundle: .module`; a declared key the catalog or `everyCase()` lacks; a catalog key
   declared nowhere; or catalog English that differs from `defaultValue`. It reads the
   catalog's source, not a compiled bundle, because `swift test` never compiles one.
 - The scan is text, not a parser. It does not see a resource made from a bare literal
   (`let title: LocalizedStringResource = "Reset"`, which also lands in the main bundle),
-  `String(localized:)`, or anything in `ClaudeUsageBarUI` — review catches those.
+  `String(localized:)`, or anything in `GbotUsageBarUI` — review catches those.
 - Edit the catalog in Xcode's editor, or by hand in the format Xcode writes: two-space
   indent, `" : "` separators, keys sorted, no trailing newline (`.editorconfig`'s
   `[*.xcstrings]` section keeps an editor from fighting that). A key the code uses has a
   `comment` and an `en` `stringUnit` with `"state" : "translated"`, and no
   `extractionState`.
 - To find drift, run `just generate`, then
-  `xcodebuild -exportLocalizations -project ClaudeUsageBar.xcodeproj -localizationPath <dir> -exportLanguage en`.
+  `xcodebuild -exportLocalizations -project GbotUsageBar.xcodeproj -localizationPath <dir> -exportLanguage en`.
   It extracts every key from Core's source **and rewrites the catalog in place**: a key
   in code but not in the catalog is added (`"extractionState" : "extracted_with_value"`,
   `"state" : "new"`), and a key no code uses gains `"extractionState" : "stale"`. Review
@@ -113,13 +113,13 @@ Checked on Xcode 26.5 (17F42) with Swift 6.3.2, 2026-09-28:
 
 | | `swift build` / `swift test` (`just test`) | `xcodebuild` (`just build`, the app) |
 |---|---|---|
-| The catalog in `ClaudeUsageBarKit_ClaudeUsageBarCore.bundle` | copied as `Localizable.xcstrings`, uncompiled | compiled to `en.lproj/Localizable.strings` |
+| The catalog in `GbotUsageBarKit_GbotUsageBarCore.bundle` | copied as `Localizable.xcstrings`, uncompiled | compiled to `en.lproj/Localizable.strings` |
 | Where English comes from at run time | each resource's `defaultValue` | the catalog |
 
 `swift build --build-system swiftbuild` (a preview) compiles the catalog too, but
 `scripts/coverage.sh` uses the native build. No gate looks inside the app: after
 `just build`, `plutil -p` on that `Localizable.strings` under
-`build/dev-derived-data/Build/Products/Debug/ClaudeUsageBar.app` shows what shipped.
+`build/dev-derived-data/Build/Products/Debug/GbotUsageBar.app` shows what shipped.
 
 ## Plurals
 

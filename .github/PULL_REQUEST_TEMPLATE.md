@@ -10,7 +10,7 @@
 ## Checklist
 
 - [ ] All checks pass (`just check`)
-- [ ] New logic lives in ClaudeUsageBarCore and is covered by Swift Testing tests
+- [ ] New logic lives in GbotUsageBarCore and is covered by Swift Testing tests
 - [ ] Adapter change: `just test-local` was run and its output is in the Test Plan (CI cannot run it)
 - [ ] Documentation updated (if applicable)
 - [ ] No breaking changes (or documented in description)

@@ -1,19 +1,19 @@
 ---
 name: designing-core-logic
 description: >
-  Covers how logic in ClaudeUsageBarCore is shaped: time, the current date, Locale, and
+  Covers how logic in GbotUsageBarCore is shaped: time, the current date, Locale, and
   randomness injected rather than read (Clock, any Clock<Duration>, Date.now,
   Locale.current, SystemRandomNumberGenerator), tunable numbers gathered in one Tuning
   type, action-shaped methods on @MainActor @Observable view models, and the patterns
   this template deliberately does not adopt. Use when adding a type, a view model, a
   timer, a debounce, a delay, a formatted string, a threshold, or anything random to
-  ClaudeUsageBarCore, or when reaching for a repository, a coordinator, a use-case class, or an
+  GbotUsageBarCore, or when reaching for a repository, a coordinator, a use-case class, or an
   event bus.
 ---
 
 # Designing Core Logic
 
-**Owns:** how a type or view model in `ClaudeUsageBarCore` is shaped so its logic stays
+**Owns:** how a type or view model in `GbotUsageBarCore` is shaped so its logic stays
 deterministic under `swift test` — what it is handed rather than reads, where tunable
 numbers live, what its entry points look like, and which patterns are not adopted.
 **Does not own:** the test-first loop itself (`tdd`); an OS integration behind a port
@@ -23,22 +23,21 @@ boundaries and import rules (`AGENTS.md` › Architecture, `.claude/rules/swift.
 
 ## Why this exists
 
-The 80% coverage floor on `ClaudeUsageBarCore` only means something if a test can reach every
+The 80% coverage floor on `GbotUsageBarCore` only means something if a test can reach every
 branch without waiting, without depending on the machine's clock, language, or luck.
 Anything Core would read from the world — the time, the locale, a random number — is
 therefore an input, the same way `UsageMenuViewModel` is handed an
-`any OAuthTokenProviding` and an `any UsageFetching` instead of running `security` or
-calling `URLSession` itself.
+`any CacheFileReading` instead of reading the desktop app's cache folder itself.
 
 These are standard-library and Foundation values, not OS integrations, so they are
-injected as plain parameters. They do not need a port in `ClaudeUsageBarPlatform`; add a port
+injected as plain parameters. They do not need a port in `GbotUsageBarPlatform`; add a port
 only when the answer really comes from an OS framework Core may not import.
 
 ## Inject time
 
 - **Waiting** (a delay, a debounce, a timeout, a periodic tick): take a clock, not
   `Task.sleep(for:)` against the real one. `platforms: [.macOS(.v14)]` in
-  `Packages/ClaudeUsageBarKit/Package.swift` makes `Clock`, `ContinuousClock`, and
+  `Packages/GbotUsageBarKit/Package.swift` makes `Clock`, `ContinuousClock`, and
   `SuspendingClock` available without an availability check.
 
   ```swift
@@ -76,7 +75,7 @@ only when the answer really comes from an OS framework Core may not import.
 - **Tests:** pass a fixed date, `{ Date(timeIntervalSince1970: 1_700_000_000) }`, and a
   `Calendar(identifier: .gregorian)` with an explicit `TimeZone(identifier: "UTC")`.
   For a clock, the test target defines its own manually advanced `Clock` (the standard
-  library ships none) — `StepClock` in `Tests/ClaudeUsageBarCoreTests/StepClock.swift`,
+  library ships none) — `StepClock` in `Tests/GbotUsageBarCoreTests/StepClock.swift`,
   never in `Sources/`. Passing a zero `Duration` through `Tuning` is often enough and
   needs no fake clock at all.
 
@@ -105,15 +104,15 @@ only when the answer really comes from an OS framework Core may not import.
 - **Tests:** Swift's standard library has no seeded generator, so the test target
   defines one — a few lines of SplitMix64 conforming to `RandomNumberGenerator` — and
   asserts on the exact sequence a given seed produces. It lives in
-  `Tests/ClaudeUsageBarCoreTests/`; shipping code never needs it.
+  `Tests/GbotUsageBarCoreTests/`; shipping code never needs it.
 
 ## One `Tuning` type
 
 - Every number someone might want to tweak — a delay, a threshold, a limit, a retry
-  count — lives in one `public struct Tuning: Sendable, Equatable` in `ClaudeUsageBarCore` with a
+  count — lives in one `public struct Tuning: Sendable, Equatable` in `GbotUsageBarCore` with a
   `` static let `default` `` (the backticks are required: `default` is a keyword), never
   as a literal scattered through method bodies. This app's is
-  `Sources/ClaudeUsageBarCore/Tuning.swift` (`refreshInterval`, `requestTimeout`).
+  `Sources/GbotUsageBarCore/Tuning.swift` (`refreshInterval`).
 - Types take a `Tuning` in their initializer (defaulting to `.default`), so a test
   passes a tiny delay or a low limit to reach a boundary quickly.
 - Durations are `Duration`, not `TimeInterval`; counts are `Int`. A doc comment on each
@@ -141,7 +140,7 @@ only when the answer really comes from an OS framework Core may not import.
   no side effects (see `UsageMenuViewModel.init`); a task the view model must own is
   started by an action and kept so it can be cancelled (`startPolling()`,
   `stopPolling()`).
-- Domain rules live in value types (`UsageWindow.percent`, `UsageResponse.snapshot()`)
+- Domain rules live in value types (`UsageWindow.percent`, `UsageCache.read(from:)`)
   that the view model holds and delegates to; the view model — or a value it derives,
   such as `UsagePresentation` — translates between them and what the view shows.
 

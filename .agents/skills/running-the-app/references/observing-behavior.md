@@ -42,7 +42,7 @@ for window in list {
 ```
 
 ```bash
-swift /tmp/windowid.swift ClaudeUsageBar     # prints one id per window
+swift /tmp/windowid.swift GbotUsageBar     # prints one id per window
 ```
 
 Reading the window list needs no permission; **capturing pixels does**. Screen Recording
@@ -60,7 +60,7 @@ back to a full-screen capture with the menu already open.
 
 ## Drive a flow with a throwaway XCUITest
 
-`LaunchUITests/` is the only XCTest target (`project.yml`'s `ClaudeUsageBarLaunchUITests`, whose
+`LaunchUITests/` is the only XCTest target (`project.yml`'s `GbotUsageBarLaunchUITests`, whose
 `sources: [LaunchUITests]` takes the whole directory), so a probe is one file plus
 `just generate`. This app's menu is `.menuBarExtraStyle(.menu)`, which drops a SwiftUI
 accessibility identifier on its entries: a probe finds the status item as
@@ -80,7 +80,7 @@ final class ScratchProbeTests: XCTestCase {
         let statusItem = app.menuBars.statusItems.firstMatch
         XCTAssertTrue(statusItem.waitForExistence(timeout: 10))
         statusItem.click()
-        XCTAssertTrue(app.menuItems["Quit ClaudeUsageBar"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.menuItems["Quit GbotUsageBar"].waitForExistence(timeout: 5))
         let shot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         shot.name = "menu-open"
         shot.lifetime = .keepAlways
@@ -99,9 +99,9 @@ Run that one test, keeping the result bundle out of the way of `just uitest`'s o
 
 ```bash
 mise exec -- xcodegen generate
-xcodebuild test -project ClaudeUsageBar.xcodeproj -scheme ClaudeUsageBar -destination 'platform=macOS' \
+xcodebuild test -project GbotUsageBar.xcodeproj -scheme GbotUsageBar -destination 'platform=macOS' \
   -derivedDataPath build/dev-derived-data -resultBundlePath build/Probe.xcresult \
-  -only-testing:ClaudeUsageBarLaunchUITests/ScratchProbeTests
+  -only-testing:GbotUsageBarLaunchUITests/ScratchProbeTests
 xcrun xcresulttool export attachments --path build/Probe.xcresult --output-path /tmp/att
 ```
 
@@ -115,7 +115,7 @@ Two rules about the probe:
 
 - **It is deleted before the pull request**, along with a re-run of `just generate`.
   `LaunchUITests/` holds the launch guarantee and nothing else; a behavior worth keeping
-  is a `ClaudeUsageBarCore` test against a fake, not a UI test (`.claude/rules/testing.md` ›
+  is a `GbotUsageBarCore` test against a fake, not a UI test (`.claude/rules/testing.md` ›
   Where a Test Goes). An XCUITest is slow, needs a GUI session, and asserts through the
   accessibility layer — everything a decision test should not be.
 - **The first local XCUITest run may prompt for Accessibility** for whatever launched
@@ -125,7 +125,7 @@ Two rules about the probe:
 
 Nothing in this app reads a launch argument or an environment variable today:
 `UsageMenuViewModel` starts from an empty `UsageState`, and no `App/` or
-`ClaudeUsageBarCore` code consults `UserDefaults` or `ProcessInfo`. The snippet below
+`GbotUsageBarCore` code consults `UserDefaults` or `ProcessInfo`. The snippet below
 passes `-probeState` and `PROBE_STATE` to prove the plumbing, not because the app answers
 them. **Do not add such a hook to the app just to observe it** — a state you only need to
 *look at* is a state a preview or a Core test can construct directly, by building a
@@ -138,8 +138,8 @@ running build:
 
 ```bash
 open --env PROBE_STATE=known-state -n \
-  build/dev-derived-data/Build/Products/Debug/ClaudeUsageBar.app --args -probeState known-state
-ps -o command= -p "$(pgrep -f 'Debug/ClaudeUsageBar.app/Contents/MacOS/ClaudeUsageBar' | head -1)"
+  build/dev-derived-data/Build/Products/Debug/GbotUsageBar.app --args -probeState known-state
+ps -o command= -p "$(pgrep -f 'Debug/GbotUsageBar.app/Contents/MacOS/GbotUsageBar' | head -1)"
 ```
 
 - `--args` puts everything after it in the process's `argv`, which is also what fills
@@ -150,7 +150,7 @@ ps -o command= -p "$(pgrep -f 'Debug/ClaudeUsageBar.app/Contents/MacOS/ClaudeUsa
   from a UI test.
 - `-n` opens a *new* instance even though one is running, which is how you end up
   watching two builds at once. Quit the verified pid first (`kill -TERM "$pid"`) unless you meant it.
-- The hook itself belongs in `ClaudeUsageBarCore`, behind one value a view model reads, so the
+- The hook itself belongs in `GbotUsageBarCore`, behind one value a view model reads, so the
   same state stays reachable from a Core test. `App/` — the composition root — is where
   the argument is read and turned into that value, and Core never learns where it came
   from.

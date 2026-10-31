@@ -9,13 +9,13 @@ paths:
 Three kinds of test, split by what is under test:
 
 - **A decision → a Core test with a fake.** Anything that branches, clamps, formats, or
-  remembers lives in `ClaudeUsageBarCore` and is tested in `Tests/ClaudeUsageBarCoreTests` against a fake
+  remembers lives in `GbotUsageBarCore` and is tested in `Tests/GbotUsageBarCoreTests` against a fake
   of the port (see "Fakes, not mocks" below). These run in CI on every push and are what
   the 80% line- and 75% function-coverage floors measure. This is the default: if an adapter looks like it
   needs a test for a decision, move the decision into Core instead.
 - **Translation to or from the OS → a local-machine test.** Whether `NSWorkspace`, an
   event tap, or the accessibility API really answers what the adapter assumes can only
-  be checked against the real OS. Those tests live in `Tests/ClaudeUsageBarPlatformTests`, every
+  be checked against the real OS. Those tests live in `Tests/GbotUsageBarPlatformTests`, every
   suite carries the `.requiresLocalMachine` trait, and a human runs them with
   `just test-local`. CI cannot: a runner has no logged-in GUI session and cannot be
   granted Accessibility, Input Monitoring, or Screen Recording. So they are reported as
@@ -47,11 +47,11 @@ reading as a broken adapter.
 - Use `@Test(arguments:)` for input/output variations; don't copy-paste test bodies
 - Group related tests in a `@Suite`; annotate `@MainActor` suites that touch view models
 - TDD is required: write the failing test first, then implement to green
-- Plain `import ClaudeUsageBarCore`, never `@testable import`: a Core test exercises the public API
+- Plain `import GbotUsageBarCore`, never `@testable import`: a Core test exercises the public API
   the rest of the app calls, so an internal can be renamed without touching a test. A
   test that seems to need an internal is either testing a detail (test the behavior it
   produces) or has found a declaration another module legitimately needs — make that
-  `package`, which every target in `Packages/ClaudeUsageBarKit` sees (`swift.md` › Access Control)
+  `package`, which every target in `Packages/GbotUsageBarKit` sees (`swift.md` › Access Control)
 
 ## What to Test
 
@@ -71,14 +71,14 @@ formula shares, where `UsageWindowTests`' case table pairing `75.5` with `76` do
 
 ## Fakes, not mocks
 
-A port declared in `ClaudeUsageBarCore` (a `Sendable` protocol whose adapter lives in
-`ClaudeUsageBarPlatform`) is substituted in tests by a **fake**, never a mock. A fake is a real,
-working implementation of the protocol that lives in `Tests/ClaudeUsageBarTestSupport`, answers
+A port declared in `GbotUsageBarCore` (a `Sendable` protocol whose adapter lives in
+`GbotUsageBarPlatform`) is substituted in tests by a **fake**, never a mock. A fake is a real,
+working implementation of the protocol that lives in `Tests/GbotUsageBarTestSupport`, answers
 from data the test hands it, and records what it was asked in a plain value — a call
 count, or the arguments it received — which the test reads afterwards with `#expect`.
 It declares no expectations up front, verifies nothing itself, and needs no framework:
-`FakeOAuthTokenProvider.swift` and `FakeUsageFetcher.swift` there are the worked
-examples to copy. It is `package`,
+`FakeCacheFileReader.swift` there is the worked
+example to copy. It is `package`,
 not `public`, and `Sendable` the honest way — a lock around what it records, never
 `@unchecked Sendable`. Every test of a given port uses that one fake, so the port's test-time
 behavior is defined in one place rather than re-stubbed per test. Asserting on the
@@ -91,23 +91,22 @@ produced, not on the interaction that produced it.
 A fake stands in for the adapter only while both keep the port's promises, so those
 promises are asserted once, against both. The contract suite is a function over the
 protocol, not over either implementation, and every clause it checks is one the port's
-`///` states (add the clause there first). `OAuthTokenProviding` is the worked example,
-and `UsageFetching` follows the same shape:
+`///` states (add the clause there first). `CacheFileReading` is the worked example:
 
-- The fakes and one contract function per port live in the `ClaudeUsageBarTestSupport` target
-  (`Tests/ClaudeUsageBarTestSupport`), which both test targets depend on — never one test target
+- The fakes and one contract function per port live in the `GbotUsageBarTestSupport` target
+  (`Tests/GbotUsageBarTestSupport`), which both test targets depend on — never one test target
   depending on another. It is test code: no product exports it, and
   `ArchitectureBoundaryTests` fails if a shipped module imports it.
-- `OAuthTokenProvidingContract.check(_:)` takes `some OAuthTokenProviding` and asserts
-  with `#expect`, asking more than once, that every token it answers is non-blank and
-  that it throws only the errors about reading the token — never one only a fetch may
-  throw. Its `violations(of:)` returns what `check(_:)` asserts on, so a Core test hands
-  it a provider that breaks a clause and sees the contract report it — the proof the
+- `CacheFileReadingContract.check(_:fileName:)` takes `some CacheFileReading` and asserts
+  with `#expect`, asking more than once, that it throws only the errors about reading a
+  file (`.cacheUnreadable`, `.cancelled`) — never one only decoding the cache may
+  throw. Its `violations(of:fileName:)` returns what `check(_:fileName:)` asserts on, so a
+  Core test hands it a reader that breaks a clause and sees the contract report it — the proof the
   contract is not vacuous.
-- `OAuthTokenProvidingContractTests` in `ClaudeUsageBarCoreTests` runs it against the fake:
+- `CacheFileReadingContractTests` in `GbotUsageBarCoreTests` runs it against the fake:
   CI runs it, so the fake cannot drift from the port.
-- `SecurityCLITokenProviderTests` in `ClaudeUsageBarPlatformTests`, a `.requiresLocalMachine`
-  suite, runs the same function against `SecurityCLITokenProvider` beside its
+- `CacheFolderReaderTests` in `GbotUsageBarPlatformTests`, a `.requiresLocalMachine`
+  suite, runs the same function against `CacheFolderReader` beside its
   translation tests (`just test-local`).
 - A port whose one promise no test can observe needs no contract suite, and says why in
   its `///`: `ApplicationTerminating` promises that the process ends.
@@ -126,10 +125,10 @@ and `UsageFetching` follows the same shape:
 - No `sleep` or timing-based assertion in a unit test; that flakiness belongs to no one.
   When time must pass, the type under test takes a clock or a `Tuning` delay (how: the
   `designing-core-logic` skill › Inject time), and the test hands it a zero `Duration`
-  or a manually advanced test `Clock` kept in `Tests/ClaudeUsageBarCoreTests/`, then advances it —
+  or a manually advanced test `Clock` kept in `Tests/GbotUsageBarCoreTests/`, then advances it —
   never `Task.sleep` to wait for something to happen
 - A test that touches the file system gets its own directory:
-  `FileManager.default.temporaryDirectory.appending(path: "ClaudeUsageBarTests-\(UUID().uuidString)")`,
+  `FileManager.default.temporaryDirectory.appending(path: "GbotUsageBarTests-\(UUID().uuidString)")`,
   created in the test and removed in a `defer`. Never a fixed shared path, the checkout,
   or the home directory — parallel tests would collide, and a leftover file changes the
   next run

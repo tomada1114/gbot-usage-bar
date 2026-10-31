@@ -45,7 +45,7 @@ just test
 just test-fast UsageResponseTests
 
 # The adapter tests CI cannot run (real OS, local machine only) — run these by hand
-# whenever you change something under Sources/ClaudeUsageBarPlatform, and put the output in the PR
+# whenever you change something under Sources/GbotUsageBarPlatform, and put the output in the PR
 just test-local
 
 # Build the app
@@ -84,16 +84,16 @@ mise exec -- scripts/lint.sh
 mise exec -- scripts/tests/run.sh
 mise exec -- scripts/checks/run-all.sh
 scripts/coverage.sh
-(cd Packages/ClaudeUsageBarKit && swift test --filter UsageResponseTests)   # just test-fast UsageResponseTests
-(cd Packages/ClaudeUsageBarKit && RUN_LOCAL_MACHINE_TESTS=1 swift test --filter ClaudeUsageBarPlatformTests)  # just test-local
+(cd Packages/GbotUsageBarKit && swift test --filter UsageResponseTests)   # just test-fast UsageResponseTests
+(cd Packages/GbotUsageBarKit && RUN_LOCAL_MACHINE_TESTS=1 swift test --filter GbotUsageBarPlatformTests)  # just test-local
 mise exec -- xcodegen generate
-xcodebuild -project ClaudeUsageBar.xcodeproj -scheme ClaudeUsageBar -configuration Debug -derivedDataPath build/dev-derived-data build
+xcodebuild -project GbotUsageBar.xcodeproj -scheme GbotUsageBar -configuration Debug -derivedDataPath build/dev-derived-data build
 scripts/run-app.sh               # just run — quits the running instance, then launches
 scripts/bundle-id.sh             # the bundle identifier project.yml declares
 log stream --predicate "subsystem == \"$(scripts/bundle-id.sh)\"" --level debug   # just logs
 scripts/reset-permissions.sh     # just reset-permissions — resets TCC for this app only
 rm -rf build/LaunchUITests.xcresult
-xcodebuild test -project ClaudeUsageBar.xcodeproj -scheme ClaudeUsageBar -destination 'platform=macOS' -derivedDataPath build/dev-derived-data -resultBundlePath build/LaunchUITests.xcresult
+xcodebuild test -project GbotUsageBar.xcodeproj -scheme GbotUsageBar -destination 'platform=macOS' -derivedDataPath build/dev-derived-data -resultBundlePath build/LaunchUITests.xcresult
 scripts/smoke_launch.sh
 scripts/sync-agents.sh           # after editing .agents/skills/ (just agents-sync)
 scripts/sync-agents.sh --check   # just agents-check
@@ -111,9 +111,9 @@ scripts/release-prep.sh 0.2.0    # just release-prep 0.2.0 — version bump + ch
 
 ### Code Standards
 
-- New logic lives in `ClaudeUsageBarCore` with Swift Testing coverage (happy + error path)
+- New logic lives in `GbotUsageBarCore` with Swift Testing coverage (happy + error path)
 - SwiftLint strict and SwiftFormat must pass with no warnings
-- Maintain or improve the 80% line-coverage and 75% function-coverage floors on `ClaudeUsageBarCore`
+- Maintain or improve the 80% line-coverage and 75% function-coverage floors on `GbotUsageBarCore`
 - Public API carries `///` doc comments that explain *why*
 
 ### Commit Messages

@@ -1,12 +1,17 @@
 # ADR-0002: Run without the App Sandbox
 
 - **Status:** Accepted (by the owner, 2026-09-29)
+- **Amended 2026-10-31:** the app no longer reads a keychain item or opens a network
+  connection ([ADR-0003](0003-usage-data-source.md) is superseded). It now reads another
+  application's cache folder under `~/Library/Application Support/`, which the App
+  Sandbox would also block without a temporary-exception entitlement, so the sandbox
+  stays off. The context below describes the original data source.
 - **Date:** 2026-09-29
 - **Deciders:** the owner
 
 ## Context
 
-The template ships `App/ClaudeUsageBar.entitlements` with `com.apple.security.app-sandbox`
+The template ships `App/GbotUsageBar.entitlements` with `com.apple.security.app-sandbox`
 on and nothing else. [ADR-0003](0003-usage-data-source.md) makes the app do two things
 that sandbox does not allow as shipped:
 

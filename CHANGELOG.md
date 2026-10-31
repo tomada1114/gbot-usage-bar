@@ -10,19 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial project scaffold from [macos-app-template](https://github.com/tomada1114/macos-app-template)
-- A menu-bar agent that shows the Claude Code weekly usage limit as a rounded
-  percentage inside a template-tinted outline of Clawd, Claude Code's mascot (`--`
-  until the first refresh)
-- A menu with the weekly and five-hour usage, their local reset times, the time of the
-  last update, a line naming why the last refresh failed, and Quit (⌘Q)
-- Refresh at launch and every minute, reading Claude Code's OAuth token from the
-  login keychain with `/usr/bin/security` and querying Anthropic's undocumented OAuth
-  usage endpoint
-- A "Show in Menu Bar" choice in the menu that switches the badge between the weekly
-  and the five-hour usage, starting on weekly at every launch
+- A menu-bar agent that shows the desktop app's weekly usage as a rounded percentage
+  inside a template-tinted rounded rectangle (`--` until the first good read)
+- A menu with the weekly usage, the weekday, date, and time it resets, when the
+  desktop app read it, a line naming why the last read failed or why the numbers may be
+  stale, and Quit (⌘Q)
+- A read at launch and every minute of the weekly usage the desktop app saves in its
+  local cache — no network request, no keychain access, and no write to its folder
 
 ### Removed
 
 - The template's example counter screen and frontmost-application example
 
-[Unreleased]: https://github.com/tomada1114/claude-usage-bar/commits/main
+[Unreleased]: https://github.com/tomada1114/gbot-usage-bar/commits/main

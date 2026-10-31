@@ -20,16 +20,14 @@ ADR ([the index](README.md)) and linked from here. What has shipped is in
 The owner decides what the page says; an agent proposes a change to it in a pull
 request, and the change lands only once the owner has approved it.
 
-- **Last reviewed:** 2026-09-29 — no issue is filed yet, so no line below links one
+- **Last reviewed:** 2026-10-31 — no issue is filed yet, so no line below links one
 
 ## Now
 
 The outcomes being worked on, one to three of them. Each has its issues filed.
 
-- **The owner settles the remaining ADRs** — [ADR-0002](adr/0002-sandbox-posture.md)
-  (sandbox off) is accepted and the badge shows real numbers. Done when: the owner
-  accepts or amends [ADR-0001](adr/0001-app-shape.md) and
-  [ADR-0003](adr/0003-usage-data-source.md).
+- **The badge matches the desktop app's own Usage page** — Done when: the owner sees
+  the same weekly percentage in the menu bar and in the desktop app, and CI is green.
 
 ## Next
 
@@ -43,6 +41,5 @@ Nothing is ordered here yet.
 Direction the app intends to take but has not ordered. No issue is filed for a line
 here, apart from a parked one that a line names.
 
-- **Survive a change to the undocumented endpoint** — what would bring it forward: the
-  endpoint's shape changing, or Anthropic publishing a supported usage API
-  ([ADR-0003](adr/0003-usage-data-source.md)).
+- **Survive a change to the desktop app's cache format** — what would bring it forward:
+  the menu showing "Unexpected usage cache format" after a desktop app update.

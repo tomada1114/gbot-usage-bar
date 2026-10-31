@@ -1,7 +1,7 @@
 # App shapes: windowed and menu-bar agent
 
 Two shapes cover most macOS apps started from this template. Choose one before writing
-features. The difference is only three files — `project.yml`, `App/ClaudeUsageBarApp.swift`, and
+features. The difference is only three files — `project.yml`, `App/GbotUsageBarApp.swift`, and
 `LaunchUITests/LaunchTests.swift` — but it decides what the launch guarantee *is*, and
 therefore what `just uitest` is able to assert at all.
 
@@ -37,29 +37,29 @@ template by `just build` and `just lint` only.
 
 ### 1. `project.yml` — one key
 
-One line in the `ClaudeUsageBar` target's `settings.base`, beside `GENERATE_INFOPLIST_FILE`
+One line in the `GbotUsageBar` target's `settings.base`, beside `GENERATE_INFOPLIST_FILE`
 (leave the UI-test target's copy of that key alone):
 
 ```yaml
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBar
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.GbotUsageBar
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_LSUIElement: YES
 ```
 
 `INFOPLIST_KEY_LSUIElement` is how a generated Info.plist gets `LSUIElement`; there is
 no Info.plist file to edit, and adding one would fight `GENERATE_INFOPLIST_FILE`.
-Regenerate with `just generate` — `ClaudeUsageBar.xcodeproj` is generated output, never edited.
+Regenerate with `just generate` — `GbotUsageBar.xcodeproj` is generated output, never edited.
 
-### 2. `App/ClaudeUsageBarApp.swift` — the entry point
+### 2. `App/GbotUsageBarApp.swift` — the entry point
 
 The scene is `MenuBarExtra { UsageMenu(model:) } label: { UsageBadgeLabel(model:) }`
 with `.menuBarExtraStyle(.menu)`, and the initializer is the composition root: it builds
-the `ClaudeUsageBarPlatform` adapters, hands them to `UsageMenuViewModel`, and calls
+the `GbotUsageBarPlatform` adapters, hands them to `UsageMenuViewModel`, and calls
 `startPolling()` so the badge fills in at launch rather than on the first click. The
-shell still only wires; the menu's content is `ClaudeUsageBarUI` views, and every decision
-they render stays in `ClaudeUsageBarCore`.
+shell still only wires; the menu's content is `GbotUsageBarUI` views, and every decision
+they render stays in `GbotUsageBarCore`.
 
 Choose the style deliberately. The `.menu` style renders the content as an `NSMenu` and
 accepts only menu-shaped content (`Button`, `Divider`, `Text`); `.menuBarExtraStyle(.window)`
@@ -69,7 +69,7 @@ measure.
 ### 3. `LaunchUITests/LaunchTests.swift` — the replacement assertion
 
 It waits for `app.menuBars.statusItems.firstMatch` instead of a window, clicks it, and
-waits for `app.menuItems["Quit ClaudeUsageBar"]` — matched by title, because the `.menu`
+waits for `app.menuItems["Quit GbotUsageBar"]` — matched by title, because the `.menu`
 style drops accessibility identifiers — then closes the menu. Quit is the one entry
 present in every state, so it proves the scene's content is wired. With the `.window`
 style the test would stop at the status item's existence.
@@ -93,10 +93,10 @@ newer SDK:
   the status item, `windows`, `popovers`, `sheets`, `groups`, `otherElements`, and
   `staticTexts` are all empty — the panel is not exposed through the app's accessibility
   tree. The launch test therefore stops at "the item exists"; the behavior inside the
-  panel is covered by `ClaudeUsageBarCore` view-model tests, which is where it belongs anyway.
+  panel is covered by `GbotUsageBarCore` view-model tests, which is where it belongs anyway.
 - **The default `.menu` style *is* reachable**: after `click()`, its entries appear as
   `app.menuItems[…]`. They are matched **by title**
-  (`app.menuItems["Quit ClaudeUsageBar"]`, as this app's launch test does) — a SwiftUI
+  (`app.menuItems["Quit GbotUsageBar"]`, as this app's launch test does) — a SwiftUI
   `.accessibilityIdentifier` on a menu `Button` is dropped, and the element's identifier
   reads `menuAction:`. A launch test that asserts more than the item's existence
   therefore depends on the English titles.
@@ -108,15 +108,15 @@ Reach for `MenuBarExtra` first — it is a pure SwiftUI scene and needs no deleg
 custom status-item view, a drag destination, or a right-click menu distinct from the
 left-click behavior.
 
-**Where the delegate lives: `ClaudeUsageBarPlatform`, not `App/`.** It imports AppKit, owns
+**Where the delegate lives: `GbotUsageBarPlatform`, not `App/`.** It imports AppKit, owns
 state, and runs at a lifecycle moment — all three make it OS-integration code, which
-`docs/architecture.md` ("Ports and adapters") puts in `ClaudeUsageBarPlatform`. `App/` keeps the
+`docs/architecture.md` ("Ports and adapters") puts in `GbotUsageBarPlatform`. `App/` keeps the
 one wiring line that names it, and nothing more; anything the delegate has to *decide*
-moves into `ClaudeUsageBarCore` behind a port, like every other adapter. (`ClaudeUsageBarUI` is the wrong
-home for the same reason it cannot see `ClaudeUsageBarPlatform`: it is the view layer, not the
+moves into `GbotUsageBarCore` behind a port, like every other adapter. (`GbotUsageBarUI` is the wrong
+home for the same reason it cannot see `GbotUsageBarPlatform`: it is the view layer, not the
 OS layer.)
 
-`Packages/ClaudeUsageBarKit/Sources/ClaudeUsageBarPlatform/StatusItemAppDelegate.swift`:
+`Packages/GbotUsageBarKit/Sources/GbotUsageBarPlatform/StatusItemAppDelegate.swift`:
 
 ```swift
 import AppKit
@@ -124,10 +124,10 @@ import AppKit
 /// Owns an `NSStatusItem` for the cases `MenuBarExtra` cannot express: a custom button
 /// view, a drag destination, or a right-click menu distinct from the left-click one.
 ///
-/// It lives in `ClaudeUsageBarPlatform` because it imports AppKit and holds state — the app
+/// It lives in `GbotUsageBarPlatform` because it imports AppKit and holds state — the app
 /// shell stays wiring only (`docs/architecture.md` › Layers) and declares it with a
 /// single `@NSApplicationDelegateAdaptor` line. Anything it has to decide belongs in
-/// `ClaudeUsageBarCore` behind a port, the same as any other adapter.
+/// `GbotUsageBarCore` behind a port, the same as any other adapter.
 @MainActor
 public final class StatusItemAppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
@@ -143,7 +143,7 @@ public final class StatusItemAppDelegate: NSObject, NSApplicationDelegate {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.image = NSImage(
             systemSymbolName: "number.circle",
-            accessibilityDescription: "ClaudeUsageBar",
+            accessibilityDescription: "GbotUsageBar",
         )
         statusItem = item
     }
@@ -152,7 +152,7 @@ public final class StatusItemAppDelegate: NSObject, NSApplicationDelegate {
 
 `applicationDidFinishLaunching(_:)` takes an unnamed parameter on purpose: SwiftLint's
 `unused_parameter` rejects a named one it never reads, and the protocol conformance does
-not care about the name. In `ClaudeUsageBarApp`, the whole wiring is:
+not care about the name. In `GbotUsageBarApp`, the whole wiring is:
 
 ```swift
     @NSApplicationDelegateAdaptor(StatusItemAppDelegate.self)
@@ -162,14 +162,14 @@ not care about the name. In `ClaudeUsageBarApp`, the whole wiring is:
 ## What an agent app loses, and what to do about it
 
 - **Quitting.** There is no ⌘Q and no app menu, so a locally run agent app has no way
-  out until you give it one: `pkill -x ClaudeUsageBar` is the stopgap (verified), a Quit control
+  out until you give it one: `pkill -x GbotUsageBar` is the stopgap (verified), a Quit control
   in the menu content is the fix. `NSApplication.shared.terminate(nil)` is AppKit, so it
-  goes behind a Core port with a `ClaudeUsageBarPlatform` adapter like any other OS call — do not
-  import AppKit into `ClaudeUsageBarUI` for it. This app's is `ApplicationTerminating` /
+  goes behind a Core port with a `GbotUsageBarPlatform` adapter like any other OS call — do not
+  import AppKit into `GbotUsageBarUI` for it. This app's is `ApplicationTerminating` /
   `NSApplicationTerminator`, reached through `UsageMenuViewModel.quit()`.
 - **Settings.** ⌘, is gone with the app menu. Add a `Settings { SettingsView() }` scene
   beside the `MenuBarExtra` in the same `body` (a `Scene` builder takes both), put
-  `SettingsView` in `ClaudeUsageBarUI`, and open it from the menu content with
+  `SettingsView` in `GbotUsageBarUI`, and open it from the menu content with
   `SettingsLink { … }` (macOS 14+, which this template already targets). This app has
   neither — add them when it has something to configure.
 - **Being noticed at all.** An agent app that launches and shows nothing is
@@ -178,7 +178,7 @@ not care about the name. In `ClaudeUsageBarApp`, the whole wiring is:
 
 ## What does not change
 
-`scripts/smoke_launch.sh`, `App/ClaudeUsageBar.entitlements`, signing and notarization, the
+`scripts/smoke_launch.sh`, `App/GbotUsageBar.entitlements`, signing and notarization, the
 coverage floor, and the layer rules are all shape-independent. An agent app is still an
 ordinary signed app bundle — `LSUIElement` only tells the Dock and the app switcher to
 ignore it.

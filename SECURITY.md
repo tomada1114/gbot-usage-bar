@@ -5,7 +5,7 @@
 **Do NOT open a public issue for security vulnerabilities.**
 
 Please report security vulnerabilities through
-[GitHub Security Advisories](https://github.com/tomada1114/claude-usage-bar/security/advisories/new).
+[GitHub Security Advisories](https://github.com/tomada1114/gbot-usage-bar/security/advisories/new).
 
 Include:
 

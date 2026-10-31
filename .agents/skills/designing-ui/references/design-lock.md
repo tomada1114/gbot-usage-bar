@@ -34,8 +34,8 @@ This app keeps each view's metrics in a `private enum Layout` beside the view
 (`UsageBadgeLabel.swift`), because `no_magic_numbers` — on through `.swiftlint.yml`'s
 `opt_in_rules: all` — rejects a bare number in a view body. That stays the rule while
 only one view uses a value. Once a second view needs the same spacing or radius, move
-the lock's values into one internal type in `ClaudeUsageBarUI` — the ADR names it — and have each
-`Layout` enum refer to it. They never go in `ClaudeUsageBarCore`: they are presentation, and Core
+the lock's values into one internal type in `GbotUsageBarUI` — the ADR names it — and have each
+`Layout` enum refer to it. They never go in `GbotUsageBarCore`: they are presentation, and Core
 does not import SwiftUI.
 
 ## A Decision section, sketched
