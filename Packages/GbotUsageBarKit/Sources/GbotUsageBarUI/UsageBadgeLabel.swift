@@ -12,17 +12,34 @@ private enum Layout {
     static let height: CGFloat = 16
     /// Keeps a single digit's badge wider than tall.
     static let minimumWidth: CGFloat = 22
+    static let warningSpacing: CGFloat = 2
+    static let warningSymbol = "exclamationmark.triangle.fill"
     /// Rendered at least at Retina density, so the badge stays crisp on a 2x display even
     /// when the label's environment reports 1x.
     static let minimumScale: CGFloat = 2
 }
 
-/// The number inside its outline, drawn in one opaque color on clear. Only its alpha
-/// matters: the image is a template, which the menu bar tints itself.
+/// The number inside its outline, after a warning mark when the last read failed, drawn
+/// in one opaque color on clear. Only its alpha matters: the image is a template, which
+/// the menu bar tints itself.
 private struct BadgeDrawing: View {
     let text: String
+    let showsWarning: Bool
 
     var body: some View {
+        HStack(spacing: Layout.warningSpacing) {
+            if showsWarning {
+                Image(systemName: Layout.warningSymbol)
+                    .font(.system(size: Layout.fontSize, weight: .semibold))
+                    // Rendered into the badge image, whose own label is what VoiceOver reads.
+                    .accessibilityHidden(true)
+            }
+            outlinedNumber
+        }
+        .foregroundStyle(.black)
+    }
+
+    private var outlinedNumber: some View {
         Text(verbatim: text)
             .font(.system(size: Layout.fontSize, weight: .semibold).monospacedDigit())
             .padding(.horizontal, Layout.horizontalPadding)
@@ -35,7 +52,6 @@ private struct BadgeDrawing: View {
                 RoundedRectangle(cornerRadius: Layout.cornerRadius)
                     .strokeBorder(lineWidth: Layout.borderWidth)
             }
-            .foregroundStyle(.black)
     }
 }
 
@@ -56,7 +72,10 @@ struct UsageBadge: View {
     }
 
     private var image: NSImage {
-        let renderer = ImageRenderer(content: BadgeDrawing(text: presentation.badgeText))
+        let renderer = ImageRenderer(content: BadgeDrawing(
+            text: presentation.badgeText,
+            showsWarning: presentation.badgeShowsWarning,
+        ))
         renderer.scale = max(displayScale, Layout.minimumScale)
         let rendered = renderer.nsImage ?? NSImage()
         rendered.isTemplate = true
@@ -70,10 +89,10 @@ struct UsageBadge: View {
 private enum PreviewState {
     static let formatter = UsageFormatter()
 
-    static func badge(percent: Double?) -> UsageBadge {
+    static func badge(percent: Double?, failure: UsageError? = nil) -> UsageBadge {
         let weekly = percent.map { UsageWindow(utilization: $0, resetsAt: nil) }
         return UsageBadge(presentation: UsagePresentation(
-            state: UsageState(weekly: weekly),
+            state: UsageState(weekly: weekly, failure: failure),
             formatter: formatter,
             now: .now,
         ))
@@ -100,6 +119,8 @@ public struct UsageBadgeLabel: View {
         PreviewState.badge(percent: 5)
         PreviewState.badge(percent: 100)
         PreviewState.badge(percent: nil)
+        PreviewState.badge(percent: 76, failure: .unexpectedFormat)
+        PreviewState.badge(percent: nil, failure: .noCachedUsage)
     }
     .padding()
 }

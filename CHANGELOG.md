@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A menu with the weekly usage, the weekday, date, and time it resets, when the
   desktop app read it, a line naming why the last read failed or why the numbers may be
   stale, and Quit (⌘Q)
+- A monochrome warning mark before the badge whenever the last read failed or the
+  numbers may be stale
 - A read at launch and every minute of the weekly usage the desktop app saves in its
   local cache — no network request, no keychain access, and no write to its folder
 

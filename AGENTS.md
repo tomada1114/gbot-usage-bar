@@ -33,14 +33,15 @@ module) are enforced from day one.
   no network, and no keychain access.
 - **The core interaction** — glancing at the menu bar: the rounded weekly percentage, a
   bare number such as `76` in a thin outlined monochrome rounded rectangle, legible at
-  menu bar text size and re-read every minute. Clicking it opens a native menu with the
-  weekly percentage, the weekday, date, and time it resets, why the last read failed or
-  why the numbers may be stale (beside the last good numbers), when the desktop app
-  read them, and Quit.
-- **Non-goals** — no colors, thresholds, or warning states on the badge; no
-  notifications; nothing beyond the weekly window; no manual refresh item; no network
-  request of its own — numbers are only as fresh as the desktop app's last read, and
-  opening the desktop app refreshes them; no write of any kind to the desktop app's
+  menu bar text size and re-read every minute, with a monochrome warning mark before it
+  whenever the last read failed or the numbers may be stale. Clicking it opens a native
+  menu with the weekly percentage, the weekday, date, and time it resets, why the last
+  read failed or why the numbers may be stale (beside the last good numbers), when the
+  desktop app read them, and Quit.
+- **Non-goals** — no colors or thresholds on the badge, and no warning state beyond that
+  one mark; no notifications; nothing beyond the weekly window; no manual refresh item;
+  no network request of its own — numbers are only as fresh as the desktop app's last
+  read, and opening the desktop app refreshes them; no write of any kind to the desktop app's
   folder, and no reading of its sign-in or the keychain; no settings window and no saved
   preferences; no history or charts; no use of the desktop app's or its maker's names
   or logos in the app's name, bundle identifier, icon, or description; no Windows or

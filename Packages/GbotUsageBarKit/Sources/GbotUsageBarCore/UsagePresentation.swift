@@ -33,6 +33,13 @@ public struct UsagePresentation: Sendable {
         weeklyPercent.map(String.init) ?? Self.unknownValue
     }
 
+    /// Whether the badge carries a warning mark: whenever the last read failed or its
+    /// numbers may be stale, so a change in the desktop app's cache shows in the menu bar
+    /// itself rather than only inside the menu, where the last good number would hide it.
+    public var badgeShowsWarning: Bool {
+        state.failure != nil
+    }
+
     /// What VoiceOver reads for the badge, which on its own is a number without context.
     public var badgeAccessibilityLabel: LocalizedStringResource {
         guard let percent = weeklyPercent else {

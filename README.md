@@ -21,8 +21,9 @@ Quit GbotUsageBar   ⌘Q
 
 The number sits inside a thin rounded rectangle that follows the menu bar's light, dark,
 and tinted appearance; it reads `--` until the first good read. The app re-reads the
-cache at launch and every minute. When a read fails, or the numbers may be stale, the
-menu keeps the last good numbers and adds one line saying why: no saved usage (open the
+cache at launch and every minute. When a read fails, or the numbers may be stale, a
+warning mark (⚠) appears before the badge — so a change in the desktop app's cache shows
+in the menu bar even while the last good number is still displayed — and the menu keeps the last good numbers and adds one line saying why: no saved usage (open the
 desktop app and sign in), the cache could not be read, its format is unexpected, or the
 numbers may be out of date (open the desktop app to refresh them).
 
@@ -70,6 +71,7 @@ with any desktop app update; the menu would then say "Unexpected usage cache for
 
 ### When it stops working
 
+A ⚠ before the badge means the last read failed; open the menu to see why.
 Run the read-only inspector, which checks the cache against every assumption above and
 names the file to fix for each one that no longer holds:
 

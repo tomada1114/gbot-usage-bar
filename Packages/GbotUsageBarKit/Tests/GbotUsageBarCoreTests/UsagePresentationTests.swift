@@ -49,6 +49,23 @@ struct UsagePresentationTests {
         #expect(shown.updated == nil)
     }
 
+    // MARK: - Warning mark
+
+    @Test
+    func `the badge carries no warning while the last read succeeded`() {
+        #expect(!Self.presentation(UsageState()).badgeShowsWarning)
+        #expect(!Self.presentation(UsageState(weekly: Self.weekly)).badgeShowsWarning)
+    }
+
+    @Test(arguments: [UsageError.noCachedUsage, .cacheUnreadable, .unexpectedFormat, .outOfDate])
+    func `the badge carries a warning whenever the last read failed, numbers or not`(
+        error: UsageError,
+    ) {
+        #expect(Self.presentation(UsageState(failure: error)).badgeShowsWarning)
+        #expect(Self.presentation(UsageState(weekly: Self.weekly, failure: error))
+            .badgeShowsWarning)
+    }
+
     // MARK: - With numbers
 
     @Test
