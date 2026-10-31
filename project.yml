@@ -1,0 +1,68 @@
+# XcodeGen manifest — the SOURCE OF TRUTH for the app target.
+# ClaudeUsageBar.xcodeproj is generated (`just generate`) and gitignored; never hand-edit it.
+name: ClaudeUsageBar
+options:
+  bundleIdPrefix: io.github.tomada1114
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  ClaudeUsageBarKit:
+    path: Packages/ClaudeUsageBarKit
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  ClaudeUsageBar:
+    type: application
+    platform: macOS
+    sources: [App]
+    dependencies:
+      - package: ClaudeUsageBarKit
+        product: ClaudeUsageBarUI
+      # The app shell is the composition root: it is the only target that links the
+      # OS adapters (ClaudeUsageBarPlatform) and hands them to Core view models as ports.
+      - package: ClaudeUsageBarKit
+        product: ClaudeUsageBarPlatform
+    # Debug alone reads an xcconfig, because only an xcconfig can `#include?` the
+    # optional, uncommitted Config/Local.xcconfig that gives a developer's Debug
+    # builds a stable signing identity — which is what keeps a TCC permission grant
+    # alive across rebuilds (Config/Debug.xcconfig explains the mechanism). Release
+    # is left out on purpose: it takes its signing from this manifest alone, so no
+    # local file can reach `just smoke` or the release workflow.
+    configFiles:
+      Debug: Config/Debug.xcconfig
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.tomada1114.ClaudeUsageBar
+        GENERATE_INFOPLIST_FILE: YES
+        # A menu-bar agent: no Dock tile, no app switcher entry, no main menu
+        # (docs/architecture/adr/0001-app-shape.md).
+        INFOPLIST_KEY_LSUIElement: YES
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_ENTITLEMENTS: App/ClaudeUsageBar.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+      configs:
+        # A target-level setting outranks the target's xcconfig, so Debug's ad-hoc
+        # default lives in Config/Debug.xcconfig where Local.xcconfig can override
+        # it. Release keeps it here, exactly as before.
+        Release:
+          CODE_SIGN_IDENTITY: "-"
+  ClaudeUsageBarLaunchUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources: [LaunchUITests]
+    dependencies:
+      - target: ClaudeUsageBar
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  ClaudeUsageBar:
+    build:
+      targets: { ClaudeUsageBar: all }
+    test:
+      targets: [ClaudeUsageBarLaunchUITests]
