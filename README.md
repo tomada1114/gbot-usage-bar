@@ -68,6 +68,18 @@ entry, named by the entry's key in lowercase base32 without padding. The app:
 not running they do not change. **The cache format is undocumented** and can change
 with any desktop app update; the menu would then say "Unexpected usage cache format".
 
+### When it stops working
+
+Run the read-only inspector, which checks the cache against every assumption above and
+names the file to fix for each one that no longer holds:
+
+```bash
+python3 .agents/skills/maintaining-the-cache-reader/scripts/inspect_cache.py
+```
+
+The `maintaining-the-cache-reader` skill (`.agents/skills/maintaining-the-cache-reader/SKILL.md`)
+walks through the diagnosis and the fix, for a person or an agent.
+
 ## Privacy
 
 - The app makes no network request, never touches the keychain or the desktop app's

@@ -249,6 +249,7 @@ tool that sees the generated copy rather than the authored one:
 | `steering-the-roadmap` | the app's direction in `docs/architecture/roadmap.md`: its Now / Next / Later horizons, who changes it and when, how the backlog and parked `on hold` issues feed it, and answering "what is next?" before `shipping-issues` |
 | `localizing-the-app` | a string a person reads: the String Catalog `Localizable.xcstrings` in `GbotUsageBarCore`, `defaultLocalization`, Core view models returning `LocalizedStringResource` (`bundle: .module`), `Text(verbatim:)` in `GbotUsageBarUI`, keeping the catalog and `LocalizationTests` in step, `xcodebuild -exportLocalizations`, plurals, and what adding a language involves |
 | `merging-dependency-prs` | landing open Dependabot (SwiftPM, GitHub Actions) and Renovate (`mise.toml`) PRs: the security checklist, one human approval for a listed batch of passing PRs, and a combined branch for conflicting bumps |
+| `maintaining-the-cache-reader` | the app showing the wrong weekly usage or a failure line after the desktop app changed: diagnosing with `scripts/inspect_cache.py`, which Swift file owns each assumption about the cache folder, file naming, and JSON shape, and fixing it test-first |
 
 ### Rules
 
